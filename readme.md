@@ -1,4 +1,4 @@
-# Convert Existing JSON Objects to Falcor JSON Graph
+# Convert Things to Falcor JSON Graph
 
 This utility makes it easy wrap pre-existing JSON REST APIs with Falcor.
 Particularly, when JSON responses contain nested sub-resources that you want to pull out and put at the top level of the graph.
