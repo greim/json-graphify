@@ -45,6 +45,7 @@ export default const convertUser = graphify({
 
 ## Pattern objects
 
+An array of these are passed as an option to the factory method (see above).
 A pattern object is an object with the shape `{ from, to }`.
 `from` is a path (an array of strings) matching things found in JSON objects that will be converted.
 `to` is a corresponding path of where to place the thing in the resultant JSON graph.
