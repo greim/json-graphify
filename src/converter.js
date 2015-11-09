@@ -4,23 +4,24 @@
  */
 
 import walkObject from './walk-object';
-import findPattern from './find-pattern';
-import compilePattern from './compile-pattern';
 import $ref from './ref';
 import deepFreeze from 'deep-freeze';
 import operate from './operate';
+import createAmender from './create-amender';
+import match from './match-paths';
 
 export default class {
 
   constructor(opts) {
+
     opts = Object.assign({
-      $index: '$index',
-      $key: '$key',
       idAttribute: 'id',
       patterns: [],
       operations: []
     }, opts);
+
     opts.patterns = opts.patterns.map(compilePattern);
+
     this._opts = deepFreeze(opts);
   }
 
@@ -126,4 +127,20 @@ function set(obj, path, value, idx, parent, prevStep) {
   } else {
     return set(obj[step], path, value, idx + 1, obj, step);
   }
+}
+
+function findPattern(patterns, path) {
+  for (let pattern of patterns) {
+    if (match(pattern.from, path)) {
+      return pattern;
+    }
+  }
+}
+
+function compilePattern(pattern) {
+  const result = Object.assign({ idAttribute: 'id' }, pattern);
+  if (result.to) {
+    result.amend = createAmender(result);
+  }
+  return result;
 }

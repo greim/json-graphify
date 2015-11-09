@@ -42,15 +42,15 @@ export default const convertUser = graphify({
 
   // These declarations control the transformation
   // from the existing object structure to JSON graph.
-  // See "pattern objects" below for more details.
-  patterns: [ ... ]
+  // See "transfer objects" below for more details.
+  transfers: [ ... ]
 });
 ```
 
-## Pattern objects
+## Transfer objects
 
 An array of these are passed as an option to the factory method (see above).
-A pattern object is an object with the shape `{ from, to }`.
+A transfer object is an object with the shape `{ from, to }`.
 `from` is a path (an array of strings) matching sub-roots found in incoming JSON objects.
 `to` is another path pointing to the sub-root's new home in the resultant JSON graph.
 Here's an example:
@@ -61,13 +61,13 @@ Here's an example:
 
 The above means: *move the `avatar` sub-object to the `mediaById` hash in the graph, leaving a $ref in its place.*
 In the above, `$id` is a special placeholder that's replaced by the actual id at conversion time.
-If the avatar has an id property other than the usual "id", then you can add an `idAttribute` to the pattern to declare a custom id attribute.
+If the avatar has an id property other than the usual "id", then you can add an `idAttribute` to declare a custom id attribute.
 
 ```js
 { from: ['avatar'], to: ['mediaById', '$id'], idAttribute: 'media_id' }
 ```
 
-For an example of patterns in action, suppose your user objects have nested `avatar` properties like so:
+For an example of transfer objects in action, suppose your user objects have nested `avatar` properties like so:
 
 ```js
 {
@@ -79,7 +79,7 @@ For an example of patterns in action, suppose your user objects have nested `ava
 ```
 
 The `avatar` object was hydrated into the user response by the REST API server, but could also have been fetched directly from `/api/media/2`.
-Thus it makes sense to move the avatar object to the top level and leave behind a $ref to it, which is exactly what the above pattern does.
+Thus it makes sense to move the avatar object to the top level and leave behind a $ref to it, which is exactly what the above does.
 
 The `from` path can also be adapted to handle arrays of things, using the special `$index` placeholder to match any positive integer.
 Supposing a user could have multiple avaters:
@@ -144,16 +144,15 @@ const jsongFrag = convertUser.toGraph(user);
 ```js
 import { operate } from 'json-graphify';
 
-# Conversion example
+# Full example
 
-Let's look at a full example containing patterns, input JSON, and output JSON Graph all together.
-Here's the converter and the patterns upon instantiation.
+Let's look at an example that ties it all together.
 
 ```js
 // create a converter for user objects
 const convertUser = graphify({
   name: 'usersById',
-  patterns: [
+  transfers: [
     { from: ['nemesis'], to: ['usersById','$id'] },
     { from: ['avatars','$index'], to: ['mediaById','$id'] },
   ]
@@ -232,7 +231,7 @@ To use in a router, return the result of the `toPathValues()` method.
 // create a converter for users
 const convertUser = graphify({
   name: 'users',
-  patterns: [ ... ]
+  transfers: [ ... ]
 });
 
 // create a falcor router
