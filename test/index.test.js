@@ -13,7 +13,7 @@ describe('index', () => {
 
   const convert = graphify({
     name: 'users',
-    patterns: [
+    move: [
       { from: ['followers','$index'], to: ['users','$id'] },
       { from: ['logo'], to: ['media','$id'] }
     ]
@@ -115,7 +115,7 @@ describe('index', () => {
 
     const converted = graphify({
       name: 'users',
-      patterns: [
+      move: [
         { from: ['followers', 0], to: ['users','$id'] }
       ]
     }).toGraph({
@@ -196,11 +196,11 @@ describe('index', () => {
     });
   });
 
-  it('should operate', () => {
+  it('should munge', () => {
 
     const converted = graphify({
       name: 'users',
-      operations: [{ select: [ 'nemesis' ], edit: id => $ref([ 'users', id ]) }]
+      munge: [{ select: [ 'nemesis' ], edit: id => $ref([ 'users', id ]) }]
     }).toGraph({
       id: '1',
       nemesis: '2'

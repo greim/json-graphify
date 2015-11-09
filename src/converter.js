@@ -6,7 +6,7 @@
 import walkObject from './walk-object';
 import $ref from './ref';
 import deepFreeze from 'deep-freeze';
-import operate from './operate';
+import munge from './munge';
 import createAmender from './create-amender';
 import match from './match-paths';
 
@@ -16,18 +16,18 @@ export default class {
 
     opts = Object.assign({
       idAttribute: 'id',
-      patterns: [],
-      operations: []
+      move: [],
+      munge: []
     }, opts);
 
-    opts.patterns = opts.patterns.map(compilePattern);
+    opts.move = opts.move.map(compileMove);
 
     this._opts = deepFreeze(opts);
   }
 
   toPathValues(obj) {
 
-    operate(obj, this._opts.operations);
+    munge(obj, this._opts.munge);
 
     // this will be returned
     const result = [];
@@ -38,21 +38,21 @@ export default class {
     // walk the object tree
     for (let { parents, path: rawPath, value, isLeaf } of walkObject(obj)) {
 
-      // if pattern exists, there was a match
-      const pattern = findPattern(
-        this._opts.patterns,
+      // if a move exists, there was a match
+      const move = findMove(
+        this._opts.move,
         rawPath
       );
 
-      if (pattern) {
+      if (move) {
 
         // if lengths match, `value` is the root of a subtree
         // which is being amended.
-        const isSubroot = pattern.from.length === rawPath.length;
+        const isSubroot = move.from.length === rawPath.length;
 
         // this is how we know what id to use
-        const idBearer = parents[pattern.from.length] || value;
-        const id = idBearer[pattern.idAttribute];
+        const idBearer = parents[move.from.length] || value;
+        const id = idBearer[move.idAttribute];
 
         if (id !== undefined) {
 
@@ -61,7 +61,7 @@ export default class {
             // this subroot is being moved, and a $ref left in its wake
             const pathA = prepend.concat(rawPath);
             const pathB = rawPath.slice();
-            pattern.amend(pathB, id);
+            move.amend(pathB, id);
             result.push({ path: pathA, value: $ref(pathB) });
           }
 
@@ -69,7 +69,7 @@ export default class {
 
             // if value is a leaf node, generate an amended result
             const path = rawPath.slice();
-            pattern.amend(path, id);
+            move.amend(path, id);
             result.push({ path, value });
 
           } else if (Array.isArray(value)) {
@@ -77,7 +77,7 @@ export default class {
             // for sub-arrays, generate an amended length result
             const path = rawPath.slice();
             path.push('length');
-            pattern.amend(path, id);
+            move.amend(path, id);
             result.push({ path, value: value.length });
           }
         }
@@ -129,16 +129,16 @@ function set(obj, path, value, idx, parent, prevStep) {
   }
 }
 
-function findPattern(patterns, path) {
-  for (let pattern of patterns) {
-    if (match(pattern.from, path)) {
-      return pattern;
+function findMove(moves, path) {
+  for (let move of moves) {
+    if (match(move.from, path)) {
+      return move;
     }
   }
 }
 
-function compilePattern(pattern) {
-  const result = Object.assign({ idAttribute: 'id' }, pattern);
+function compileMove(move) {
+  const result = Object.assign({ idAttribute: 'id' }, move);
   if (result.to) {
     result.amend = createAmender(result);
   }

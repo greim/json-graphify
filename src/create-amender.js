@@ -3,11 +3,11 @@
  * MIT License. See mit-license.txt for more info.
  */
 
-export default function(pattern) {
+export default function(move) {
   return (path, id) => {
-    path.splice(0, pattern.from.length);
-    path.unshift.apply(path, pattern.to);
-    for (let i=0; i<pattern.to.length; i++) {
+    path.splice(0, move.from.length);
+    path.unshift.apply(path, move.to);
+    for (let i=0; i<move.to.length; i++) {
       if (path[i] === '$id') {
         path[i] = id;
       }

@@ -36,21 +36,21 @@ export default const convertUser = graphify({
 
   // these declarations describe arbitrary operations
   // on incoming JSON objects prior to being transformed
-  // into graphs. See "operation objects" below for more
+  // into graphs. See "munge objects" below for more
   // details.
-  operations: [ ... ],
+  munge: [ ... ],
 
   // These declarations control the transformation
   // from the existing object structure to JSON graph.
-  // See "transfer objects" below for more details.
-  transfers: [ ... ]
+  // See "move objects" below for more details.
+  move: [ ... ]
 });
 ```
 
-## Transfer objects
+## Move objects
 
 An array of these are passed as an option to the factory method (see above).
-A transfer object is an object with the shape `{ from, to }`.
+A move object is an object with the shape `{ from, to }`.
 `from` is a path (an array of strings) matching sub-roots found in incoming JSON objects.
 `to` is another path pointing to the sub-root's new home in the resultant JSON graph.
 Here's an example:
@@ -67,7 +67,7 @@ If the avatar has an id property other than the usual "id", then you can add an 
 { from: ['avatar'], to: ['mediaById', '$id'], idAttribute: 'media_id' }
 ```
 
-For an example of transfer objects in action, suppose your user objects have nested `avatar` properties like so:
+For an example of move objects in action, suppose your user objects have nested `avatar` properties like so:
 
 ```js
 {
@@ -88,15 +88,15 @@ Supposing a user could have multiple avaters:
 { from: ['avatars','$index'], to: ['mediaById','$id'] }
 ```
 
-## Operation objects
+## Munge objects
 
 An array of these are passed as an option to the factory method (see above).
-An operation object is an object with the shape `{ select, edit }`.
+A munge object is an object with the shape `{ select, edit }`.
 `select` is an array of strings matching one or more sub-roots in the JSON object.
 `edit` is a mapping function which accepts an existing value and returns a new value.
 
 For example, suppose your user object contains a `followers` array of id strings.
-You can use an operation to convert those followers to Falcor references:
+You can use an munge to convert those followers to Falcor references:
 
 ```js
 // raw user JSON object
@@ -107,7 +107,7 @@ You can use an operation to convert those followers to Falcor references:
   followers: [ '2', '3' ]
 }
 
-// operation
+// munge
 { select: [ 'followers', '$index' ], edit: id => $ref([ 'users', id ]) }
 
 // modified JSON object
@@ -141,9 +141,6 @@ const user = await fetchJson('/api/users/123');
 const jsongFrag = convertUser.toGraph(user);
 ```
 
-```js
-import { operate } from 'json-graphify';
-
 # Full example
 
 Let's look at an example that ties it all together.
@@ -152,7 +149,7 @@ Let's look at an example that ties it all together.
 // create a converter for user objects
 const convertUser = graphify({
   name: 'usersById',
-  transfers: [
+  move: [
     { from: ['nemesis'], to: ['usersById','$id'] },
     { from: ['avatars','$index'], to: ['mediaById','$id'] },
   ]
@@ -231,7 +228,7 @@ To use in a router, return the result of the `toPathValues()` method.
 // create a converter for users
 const convertUser = graphify({
   name: 'users',
-  transfers: [ ... ]
+  move: [ ... ]
 });
 
 // create a falcor router
