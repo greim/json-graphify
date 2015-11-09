@@ -53,7 +53,7 @@ Here's an example:
 { from: ['avatar'], to: ['mediaById', '$id'] }
 ```
 
-The above means *move the avatar sub-object to the `mediaById` hash in the graph, leaving a $ref in its place.*
+The above means *move the `avatar` sub-object to the `mediaById` hash in the graph, leaving a $ref in its place.*
 In the above, `$id` is a special placeholder that's replaced by the actual id at conversion time.
 If the avatar has an id property other than the usual "id", then you can add an `idAttribute` to the pattern to declare a custom id attribute.
 
