@@ -1,7 +1,7 @@
 # Convert Things to Falcor JSON Graph
 
 
-This makes it easy to get started with Falcor by transforming objects obtained from pre-existing JSON REST APIs into conformant JSON graph objects.
+This makes it easy to bring Falcor into non-greenfield projects by transforming objects obtained from pre-existing JSON REST APIs into conformant JSON graph objects.
 
 ## Install
 
