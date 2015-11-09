@@ -61,7 +61,7 @@ If the avatar has an id property other than the usual "id", then you can add an 
 { from: ['avatar'], to: ['mediaById', '$id'], idAttribute: 'media_id' }
 ```
 
-For example of patterns in action, suppose your user objects have nested `avatar` properties like so:
+For an example of patterns in action, suppose your user objects have nested `avatar` properties like so:
 
 ```js
 {
