@@ -56,7 +56,10 @@ A move object is an object with the shape `{ from, to }`.
 Here's an example:
 
 ```js
-{ from: ['avatar'], to: ['mediaById', '$id'] }
+{
+  from: ['avatar'],
+  to: ['mediaById', '$id']
+}
 ```
 
 The above means: *move the `avatar` sub-object to the `mediaById` hash in the graph, leaving a $ref in its place.*
@@ -64,28 +67,52 @@ In the above, `$id` is a special placeholder that's replaced by the actual id at
 If the avatar has an id property other than the usual "id", then you can add an `idAttribute` to declare a custom id attribute.
 
 ```js
-{ from: ['avatar'], to: ['mediaById', '$id'], idAttribute: 'media_id' }
+{
+  from: ['avatar'],
+  to: ['mediaById', '$id'],
+  idAttribute: 'media_id'
+}
 ```
 
 For an example of move objects in action, suppose your user objects have nested `avatar` properties like so:
 
 ```js
-{
+// raw json
+const user = {
   id: '1',
   username: 'greim',
   email: 'greim@example.com',
   avatar: { id: '2', src: 'http://media.example.com/a45s3c.jpg' }
+};
+
+// converter
+const convertUser = graphify({
+  name: 'usersById',
+  move: [{
+    from: ['avatars','$index'],
+    to: ['mediaById','$id']
+  }]
+})
+
+console.log(convertUser.toGraph(user));
+
+// result
+{
+  usersById: {
+    '1': {
+      id: '1',
+      username: 'greim',
+      email: 'greim@example.com',
+      avatar: { $type: 'ref', value: [ 'mediaById', '2' ] }
+    }
+  },
+  mediaById: {
+    '2': {
+      id: '2',
+      src: 'http://media.example.com/a45s3c.jpg'
+    }
+  }
 }
-```
-
-The `avatar` object was hydrated into the user response by the REST API server, but could also have been fetched directly from `/api/media/2`.
-Thus it makes sense to move the avatar object to the top level and leave behind a $ref to it, which is exactly what the above does.
-
-The `from` path can also be adapted to handle arrays of things, using the special `$index` placeholder to match any positive integer.
-Supposing a user could have multiple avaters:
-
-```js
-{ from: ['avatars','$index'], to: ['mediaById','$id'] }
 ```
 
 ## Munge objects
@@ -108,15 +135,18 @@ You can use a munge to convert those followers to Falcor references:
 }
 
 // munge
-{ select: [ 'followers', '$index' ], edit: id => $ref([ 'users', id ]) }
+{
+  select: [ 'followers', '$index' ],
+  edit: id => $ref([ 'users', id ])
+}
 
 // modified JSON object
 {
   username: 'greim',
   email: 'greim@example.com',
   followers: [
-    { $type: 'ref', value: [ 'users', '123' ],
-    { $type: 'ref', value: [ 'users', '456' ]
+    { $type: 'ref', value: [ 'users', '2' ],
+    { $type: 'ref', value: [ 'users', '3' ]
   ]
 }
 ```
