@@ -68,16 +68,16 @@ For example, suppose your user objects have nested `avatar` properties like so:
 ```
 
 The `avatar` object was hydrated into the user response by the REST API server, but could also have been fetched directly from `/api/media/2`.
-Since we want to have its own representation in the JSON graph, we use the above pattern.
+Thus it makes sense to move the avatar object to the top level and leave behind a $ref to it, which is exactly what the above pattern does.
 
-But what if instead of a singular `avatar`, we have an array of `avatars`?
-In that case we change our pattern to:
+Now, what if instead of a singular `avatar`, we have an array of `avatars`?
+In that case we change our pattern to this:
 
 ```js
 { from: ['avatars','$index'], to: ['mediaById','$id'] }
 ```
 
-`$index` is once again a special placeholder value which matches any positive integer (i.e. an array index).
+`$index` is a special placeholder value which matches any array index, AKA positive integer.
 
 ### `convert.toGraph()`
 
@@ -90,8 +90,7 @@ const jsongFrag = convertUser.toGraph(user);
 
 ### `convert.toPaths()`
 
-To turn a JSON object into a thing suitable to be returned from a Falcor router, use the `toPaths()` method.
-In other words, an array of objects with the shape `{ path, value }`.
+More often you'll want to to turn a JSON object into an array of `{ path, value }` objects to be returned from a Falcor router, which is what the `toPaths()` method does.
 
 ```js
 const user = await fetchJson('/api/users/123');
