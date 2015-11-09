@@ -1,7 +1,7 @@
 # Convert Things to Falcor JSON Graph
 
-
-This makes it easy to bring Falcor into non-greenfield projects by transforming objects obtained from pre-existing JSON REST APIs into conformant JSON graph objects.
+This makes it easy to bring [Falcor](http://netflix.github.io/falcor/) into non-greenfield projects.
+It does so by transforming objects obtained from pre-existing JSON REST APIs into conformant [JSON Graph](http://netflix.github.io/falcor/documentation/jsongraph.html) objects.
 
 # Install
 
