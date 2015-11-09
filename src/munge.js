@@ -13,7 +13,7 @@ export default function(obj, munges) {
         if (match(select, path, true)) {
           const parent = parents[parents.length - 1];
           const prop = path[path.length - 1];
-          parent[prop] = edit(value);
+          parent[prop] = edit(value, parent);
         }
       }
     }
