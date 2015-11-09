@@ -52,12 +52,11 @@ Here's an example:
 
 ```js
 { from: ['avatar'], to: ['media', '$id'] }
-// or use this if media id properties aren't just "id"
-// { from: ['avatar'], to: ['media', '$id'], idProp: 'media_id' }
 ```
 
 The above means *take the avatar sub-object and move it to the top-level `media` hash in the graph, leaving a $ref in its place.*
 In the above, `$id` is a special placeholder that will be replaced by the actual id at conversion time.
+(If the avatar has a different id property, e.g. `media_id`, then add `idProp: "media_id"` to the above.)
 For example, suppose your user objects have nested `avatar` properties like so:
 
 ```js
