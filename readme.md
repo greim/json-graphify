@@ -52,7 +52,7 @@ A pattern object is an object with the shape `{ from, to }`.
 Here's an example:
 
 ```js
-{ from: ['avatar'], to: ['media', '$id'] }
+{ from: ['avatar'], to: ['mediaById', '$id'] }
 ```
 
 The above means *take the avatar sub-object and move it to the top-level `media` hash in the graph, leaving a $ref in its place.*
