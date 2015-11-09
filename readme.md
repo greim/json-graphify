@@ -33,7 +33,7 @@ export default const convertUser = graphify({
   // Objects passed to this converter will
   // be assumed to have an "id" property.
   // Optional. Defaults to "id".
-  idProp: 'id',
+  idAttribute: 'id',
 
   // These declarative patterns control the
   // transformation from the existing object
@@ -57,10 +57,10 @@ Here's an example:
 
 The above means *move the avatar sub-object to the `mediaById` hash in the graph, leaving a $ref in its place.*
 In the above, `$id` is a special placeholder that's replaced by the actual id at conversion time.
-If the avatar has an id property other than the usual "id", then you can add an `idProp` to declare a custom id attribute.
+If the avatar has an id property other than the usual "id", then you can add an `idAttribute` to the pattern to declare a custom id attribute.
 
 ```js
-{ from: ['avatar'], to: ['mediaById', '$id'], idProp: 'media_id' }
+{ from: ['avatar'], to: ['mediaById', '$id'], idAttribute: 'media_id' }
 ```
 
 For example of patterns in action, suppose your user objects have nested `avatar` properties like so:

@@ -13,21 +13,21 @@ describe('compile-pattern', () => {
   it('should compile a pattern', () => {
     const pattern = compilePattern({ from: ['foo','bar','baz'], to: ['x','y','z'] });
     assert(typeof pattern.amend === 'function');
-    assert.strictEqual(pattern.idProp, 'id');
+    assert.strictEqual(pattern.idAttribute, 'id');
     assert.deepEqual(pattern.from, ['foo','bar','baz']);
     assert.deepEqual(pattern.to, ['x','y','z']);
   });
 
   it('should compile a pattern with an alternate id prop', () => {
-    const pattern = compilePattern({ from: ['foo','bar','baz'], to: ['x','y','z'], idProp: 'xxx' });
+    const pattern = compilePattern({ from: ['foo','bar','baz'], to: ['x','y','z'], idAttribute: 'xxx' });
     assert(typeof pattern.amend === 'function');
-    assert.strictEqual(pattern.idProp, 'xxx');
+    assert.strictEqual(pattern.idAttribute, 'xxx');
     assert.deepEqual(pattern.from, ['foo','bar','baz']);
     assert.deepEqual(pattern.to, ['x','y','z']);
   });
 
   it('should create an amender', () => {
-    const pattern = compilePattern({ from: ['foo','bar','baz'], to: ['x','$id'], idProp: 'xxx' });
+    const pattern = compilePattern({ from: ['foo','bar','baz'], to: ['x','$id'], idAttribute: 'xxx' });
     const path = ['foo','bar','baz','qux'];
     pattern.amend(path, 'xxx');
     assert.deepEqual(path, ['x','xxx','qux']);

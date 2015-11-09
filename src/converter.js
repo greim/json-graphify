@@ -15,7 +15,7 @@ export default class {
     opts = Object.assign({
       $index: '$index',
       $key: '$key',
-      idProp: 'id'
+      idAttribute: 'id'
     }, opts);
     opts.patterns = opts.patterns.map(compilePattern);
     opts.match = createMatcher(opts);
@@ -28,7 +28,7 @@ export default class {
     const result = [];
 
     // prepend this to every non-amended path
-    const prepend = [ this._opts.name, obj[this._opts.idProp] ];
+    const prepend = [ this._opts.name, obj[this._opts.idAttribute] ];
 
     // walk the object tree
     for (const { parents, path: rawPath, value } of walkObject(obj)) {
@@ -46,7 +46,7 @@ export default class {
 
         // this is how we know what id to use
         const idBearer = parents[pattern.from.length] || value;
-        const id = idBearer[pattern.idProp];
+        const id = idBearer[pattern.idAttribute];
 
         if (id !== undefined) {
 

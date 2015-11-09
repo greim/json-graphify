@@ -8,7 +8,7 @@ import createAmender from './create-amender';
 export default function compilePattern(pattern) {
 
   const newPattern = Object.assign({
-    idProp: 'id'
+    idAttribute: 'id'
   }, pattern);
 
   newPattern.amend = createAmender(newPattern);
