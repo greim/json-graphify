@@ -1,7 +1,7 @@
 # Convert Things to Falcor JSON Graph
 
 
-This makes it easy to get started with Falcor by exposing pre-existing JSON REST API endpoints as JSON graph objects.
+This makes it easy to get started with Falcor by transforming objects obtained from pre-existing JSON REST APIs into conformant JSON graph objects.
 
 ## Install
 
@@ -14,7 +14,7 @@ npm install convert-to-jsong
 ### Main factory function
 
 This module exports a factory function which creates custom converters based on options you pass to it.
-You can then use a converter to transform JSON objects to graphs.
+You can then use a converter to transform JSON objects to conformant JSON graphs.
 Typically, you'd create separate converters for every different type of object returned from your API.
 
 ```js
