@@ -149,10 +149,11 @@ console.log(jsongFrag);
       id: '1',
       username: 'greim',
       email: 'greim@example.com',
-      avatars: [
-        { $type: 'ref', value: [ 'mediaById', '2' ] },
-        { $type: 'ref', value: [ 'mediaById', '3' ] }
-      ]
+      avatars: {
+        length: 2,
+        0: { $type: 'ref', value: [ 'mediaById', '2' ] },
+        1: { $type: 'ref', value: [ 'mediaById', '3' ] }
+      }
       nemesis: { $type: 'ref', value: [ 'usersById', '4' ] }
     },
     '4': {
