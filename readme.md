@@ -178,14 +178,21 @@ console.log(jsongFrag);
 
 # Example with Falcor Router
 
+To use in a router, return the result of the `toPaths()` method.
+
 ```js
+const convertUser = converter({
+  name: 'users',
+  patterns: [ ... ]
+});
+
 const MyRouter = FalcorRouter.createClass([{
   route: "users[{keys:ids}]",
   get: async function(pathSet) {
     const ids = pathSet.ids;
     const userPromises = ids.map(id => fetchJson(`/api/users/${id}`));
     const rawUsers = yield Promise.all(userPromises);
-    return concat(rawUsers.map(convertUser.toPaths));
+    return concat(rawUsers.map(convertUser.toPaths)); // <-- conversion!
   }
 }]);
 
