@@ -92,7 +92,7 @@ Supposing a user could have multiple avaters:
 
 An array of these are passed as an option to the factory method (see above).
 A munge object is an object with the shape `{ select, edit }`.
-`select` is an array of strings matching one or more sub-roots in the JSON object.
+`select` is a path (an array of strings) matching one or more sub-roots in the JSON object.
 `edit` is a mapping function which accepts an existing value and returns a new value.
 
 For example, suppose your user object contains a `followers` array of id strings.
