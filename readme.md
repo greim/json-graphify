@@ -6,7 +6,7 @@ This makes it easy to get started with Falcor by transforming objects obtained f
 ## Install
 
 ```
-npm install convert-to-jsong
+npm install json-graphify
 ```
 
 ## API Documentation
@@ -18,7 +18,7 @@ You can then use a converter to transform JSON objects to conformant JSON graphs
 Typically, you'd create separate converters for every different type of object returned from your API.
 
 ```js
-import converter from 'convert-to-jsong';
+import converter from 'json-graphify';
 
 // Create an object that we can use to convert user
 // objects returned from the "/api/users/{id}" endpoint
