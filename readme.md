@@ -80,23 +80,23 @@ In that case we change our pattern to this:
 
 `$index` is a special placeholder value which matches any array index, AKA positive integer.
 
-## `convert.toGraph()`
-
-To turn a JSON object into a graph, pass your JSON object to the `toGraph()` method.
-
-```js
-const user = await fetchJson('/api/users/123');
-const jsongFrag = convertUser.toGraph(user);
-```
-
 ## `convert.toPaths()`
 
-More often you'll want to to turn a JSON object into an array of `{ path, value }` objects to be returned from a Falcor router, which is what the `toPaths()` method does.
+Usually you'll want to to turn a JSON object into an array of `{ path, value }` objects to be returned from a Falcor router, which is what the `toPaths()` method does.
 
 ```js
 const user = await fetchJson('/api/users/123');
 const paths = convertUser.toPaths(user);
 return paths;
+```
+
+## `convert.toGraph()`
+
+To turn a JSON object directly into a graph, pass your JSON object to the `toGraph()` method.
+
+```js
+const user = await fetchJson('/api/users/123');
+const jsongFrag = convertUser.toGraph(user);
 ```
 
 # Conversion example
