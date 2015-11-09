@@ -10,7 +10,9 @@
   },
   "keywords": [
     "falcor",
-    "json graph"
+    "falcorjs",
+    "JSON",
+    "graph"
   ],
   "author": "Greg Reimer <gregreimer@gmail.com>",
   "license": "MIT",
