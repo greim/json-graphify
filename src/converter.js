@@ -69,9 +69,17 @@ export default class {
           }
 
           if (isLeaf) {
+
             const path = rawPath.slice();
             pattern.amend(path, id);
             result.push({ path, value });
+
+          } else if (Array.isArray(value)) {
+
+            const path = rawPath.slice();
+            path.push('length');
+            pattern.amend(path, id);
+            result.push({ path, value: value.length });
           }
         }
 
@@ -79,6 +87,12 @@ export default class {
 
         const path = prepend.concat(rawPath);
         result.push({ path, value });
+
+      } else if (Array.isArray(value)) {
+
+        const path = prepend.concat(rawPath);
+        path.push('length');
+        result.push({ path, value: value.length });
       }
     }
     return result;
@@ -103,7 +117,7 @@ function set(obj, path, value, idx, parent, prevStep) {
   idx = idx || 0;
   const step = path[idx];
   if (!obj) {
-    obj = Number.isInteger(step) ? [] : {};
+    obj = {};
     parent && (parent[prevStep] = obj);
   }
   if (idx === path.length - 1) {

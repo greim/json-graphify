@@ -64,12 +64,34 @@ describe('index', () => {
     assert.deepEqual(converted, [
       { path: ['users', '1', 'id'], value: '1' },
       { path: ['users', '1', 'username'], value: 'foo' },
+      { path: ['users', '1', 'followers', 'length'], value: 2 },
       { path: ['users', '1', 'followers', 0], value: { $type: 'ref', value: ['users', '2'] } },
       { path: ['users', '2', 'id' ], value: '2' },
       { path: ['users', '2', 'username' ], value: 'bar' },
       { path: ['users', '1', 'followers', 1], value: { $type: 'ref', value: ['users', '3'] } },
       { path: ['users', '3', 'id' ], value: '3' },
       { path: ['users', '3', 'username' ], value: 'baz' }
+    ]);
+  });
+
+  it('should add a length to an amended path', () => {
+
+    const converted = convert.toPaths({
+      id: '1',
+      username: 'foo',
+      followers: [
+        { id: '3', username: 'baz', foo: [] }
+      ]
+    });
+
+    assert.deepEqual(converted, [
+      { path: ['users', '1', 'id'], value: '1' },
+      { path: ['users', '1', 'username'], value: 'foo' },
+      { path: ['users', '1', 'followers', 'length'], value: 1 },
+      { path: ['users', '1', 'followers', 0], value: { $type: 'ref', value: ['users', '3'] } },
+      { path: ['users', '3', 'id' ], value: '3' },
+      { path: ['users', '3', 'username' ], value: 'baz' },
+      { path: ['users', '3', 'foo', 'length' ], value: 0 }
     ]);
   });
 
@@ -86,6 +108,7 @@ describe('index', () => {
     assert.deepEqual(converted, [
       { path: ['users', '1', 'id'], value: '1' },
       { path: ['users', '1', 'username'], value: 'foo' },
+      { path: ['users', '1', 'followers', 'length'], value: 1 }
     ]);
   });
 
@@ -112,10 +135,11 @@ describe('index', () => {
         1: {
           id: '1',
           username: 'foo',
-          followers: [
-            { $type: 'ref', value: [ 'users', '2' ] },
-            { $type: 'ref', value: [ 'users', '3' ] }
-          ],
+          followers: {
+            0: { $type: 'ref', value: [ 'users', '2' ] },
+            1: { $type: 'ref', value: [ 'users', '3' ] },
+            length: 2
+          },
           logo: { $type: 'ref', value: [ 'media', '4' ] }
         },
         2: {
