@@ -13,7 +13,7 @@ npm install json-graphify
 ## Main factory function
 
 This module exports a factory function which creates an object transformer based a set of declarative rules you provide.
-The resultant converter can be kept in memory and endlessly re-used to transform JSON objects into conformant JSON graph fragments.
+The resultant converter is stateless, and can be kept in memory and endlessly re-used to transform JSON objects into conformant JSON graph fragments.
 You can create a separate converter for each different type returned from your API.
 
 ```js
