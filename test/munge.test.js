@@ -39,4 +39,16 @@ describe('munge', () => {
     munge(obj, [{ select: ['b',0], edit: val => val.toUpperCase() }]);
     assert.deepEqual(obj, {a:'a',b:['B','c']});
   });
+
+  it('should delete props from an object', () => {
+    const obj = {a:'a',b:{c:2}};
+    munge(obj, [{ select: ['b','c'], edit: () => undefined }]);
+    assert.deepEqual(obj, {a:'a',b:{}});
+  });
+
+  it('should not delete props from an array', () => {
+    const obj = {a:'a',b:[1,2]};
+    munge(obj, [{ select: ['b','$index'], edit: () => undefined }]);
+    assert.deepEqual(obj, {a:'a',b:[undefined,undefined]});
+  });
 });
