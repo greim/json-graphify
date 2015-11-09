@@ -9,22 +9,6 @@ import findPattern from './find-pattern';
 import compilePattern from './compile-pattern';
 import $ref from './ref';
 
-/*
-var userConverter = new Converter({
-  patterns: [ ... ],
-  name: 'users',
-  idProp: 'id',
-  $index: '$index',
-  $key: '$key'
-})
-
-var userConverter = new Converter([
-  { from: ['user','champions','$index'], to: ['champions','$id'] }
-])
-
-userConverter.convert(userObj)
-*/
-
 export default class {
 
   constructor(opts) {
