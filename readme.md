@@ -96,7 +96,7 @@ A munge object is an object with the shape `{ select, edit }`.
 `edit` is a mapping function which accepts an existing value and returns a new value.
 
 For example, suppose your user object contains a `followers` array of id strings.
-You can use an munge to convert those followers to Falcor references:
+You can use a munge to convert those followers to Falcor references:
 
 ```js
 // raw user JSON object
