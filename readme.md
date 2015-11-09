@@ -3,15 +3,15 @@
 
 This makes it easy to bring Falcor into non-greenfield projects by transforming objects obtained from pre-existing JSON REST APIs into conformant JSON graph objects.
 
-## Install
+# Install
 
 ```
 npm install json-graphify
 ```
 
-## API Documentation
+# API Documentation
 
-### Main factory function
+## Main factory function
 
 This module exports a factory function which creates custom converters based on options you pass to it.
 You can then use a converter to transform JSON objects to conformant JSON graphs.
@@ -43,7 +43,7 @@ export default const convertUser = converter({
 });
 ```
 
-### Pattern objects
+## Pattern objects
 
 A pattern object is an object with the shape `{ from, to }`.
 `from` is a path (an array of strings) matching things found in JSON objects that will be converted.
@@ -79,7 +79,7 @@ In that case we change our pattern to this:
 
 `$index` is a special placeholder value which matches any array index, AKA positive integer.
 
-### `convert.toGraph()`
+## `convert.toGraph()`
 
 To turn a JSON object into a graph, pass your JSON object to the `toGraph()` method.
 
@@ -88,7 +88,7 @@ const user = await fetchJson('/api/users/123');
 const jsongFrag = convertUser.toGraph(user);
 ```
 
-### `convert.toPaths()`
+## `convert.toPaths()`
 
 More often you'll want to to turn a JSON object into an array of `{ path, value }` objects to be returned from a Falcor router, which is what the `toPaths()` method does.
 
@@ -98,7 +98,7 @@ const paths = convertUser.toPaths(user);
 return paths;
 ```
 
-## Conversion example
+# Conversion example
 
 Let's look at a full example contain a set of patterns, input JSON, and output JSON graph all together.
 Here's the converter and the patterns upon instantiation.
@@ -175,5 +175,21 @@ console.log(jsongFrag);
 }
 ```
 
+# Example with Falcor Router
 
+```js
+const MyRouter = FalcorRouter.createClass([{
+  route: "users[{keys:ids}]",
+  get: async function(pathSet) {
+    const ids = pathSet.ids;
+    const userPromises = ids.map(id => fetchJson(`/api/users/${id}`));
+    const rawUsers = yield Promise.all(userPromises);
+    return concat(rawUsers.map(convertUser.toPaths));
+  }
+}]);
+
+function concat(arrs) {
+  return arrs.reduce((a, b) => a.concat(b), []);
+}
+```
 
