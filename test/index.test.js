@@ -103,13 +103,48 @@ describe('index', () => {
       followers: [ '2' ]
     });
 
-    //console.log(JSON.stringify(converted));
-
     assert.deepEqual(converted, [
       { path: ['users', '1', 'id'], value: '1' },
       { path: ['users', '1', 'username'], value: 'foo' },
       { path: ['users', '1', 'followers', 'length'], value: 1 }
     ]);
+  });
+
+  it('should convert using literal indices', () => {
+
+    const converted = createConverter({
+      name: 'users',
+      patterns: [
+        { from: ['followers', 0], to: ['users','$id'] }
+      ]
+    }).toGraph({
+      id: '1',
+      username: 'foo',
+      followers: [
+        { id: '2', username: 'bar' },
+        { id: '3', username: 'baz' }
+      ]
+    });
+
+    //console.log(JSON.stringify(converted, null, 3));
+
+    assert.deepEqual(converted, {
+      users: {
+        '1': {
+          id: '1',
+          username: 'foo',
+          followers: {
+            0: { $type: 'ref', value: [ 'users', '2' ] },
+            1: { id: '3', username: 'baz' },
+            length: 2
+          }
+        },
+        '2': {
+          id: '2',
+          username: 'bar'
+        }
+      }
+    });
   });
 
   it('should convert to JSON graph', () => {

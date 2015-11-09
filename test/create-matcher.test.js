@@ -121,4 +121,11 @@ describe('create-matcher', () => {
     const match = createMatcher({ $index, $key });
     assert(match(['$foo','$foo'], ['foo','bar']));
   });
+
+  it('should match literal indices', () => {
+    const $index = '$index';
+    const $key = '$key';
+    const match = createMatcher({ $index, $key });
+    assert(match(['foo', 1], ['foo', 1]));
+  });
 });

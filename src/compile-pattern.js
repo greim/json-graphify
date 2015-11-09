@@ -3,6 +3,8 @@
  * MIT License. See mit-license.txt for more info.
  */
 
+ import deepFreeze from 'deep-freeze';
+
 import createAmender from './create-amender';
 
 export default function compilePattern(pattern) {
@@ -12,5 +14,5 @@ export default function compilePattern(pattern) {
   }, pattern);
 
   newPattern.amend = createAmender(newPattern);
-  return Object.freeze(newPattern);
+  return deepFreeze(newPattern);
 }

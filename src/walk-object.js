@@ -12,16 +12,32 @@ export default function* walkObj(obj, parents, path) {
   path = path || [];
   if (typeof obj === 'object') {
     parents.push(obj);
-    for (const key in obj) {
-      if (!obj.hasOwnProperty(key)) { continue; }
-      const child = obj[key];
-      path.push(key);
-      yield { parents, path, value: child };
-      if (typeof child === 'object') {
-        yield* walkObj(child, parents, path);
+
+    if (Array.isArray(obj)) {
+
+      for (let idx=0; idx<obj.length; idx++) {
+        const child = obj[idx];
+        path.push(idx);
+        yield { parents, path, value: child };
+        if (typeof child === 'object') {
+          yield* walkObj(child, parents, path);
+        }
+        path.pop();
       }
-      path.pop();
+    } else {
+
+      for (const key in obj) {
+        if (!obj.hasOwnProperty(key)) { continue; }
+        const child = obj[key];
+        path.push(key);
+        yield { parents, path, value: child };
+        if (typeof child === 'object') {
+          yield* walkObj(child, parents, path);
+        }
+        path.pop();
+      }
     }
+
     parents.pop();
   }
 }
