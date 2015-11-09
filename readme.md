@@ -93,7 +93,7 @@ return paths;
 ## `convert.toGraph()`
 
 To turn a JSON object directly into a graph, pass your JSON object to the `toGraph()` method.
-This might be useful for example in pre-populating a client-side Falcor Model cache.
+This might be useful for example in boostrapping a client-side Falcor Model cache.
 
 ```js
 const user = await fetchJson('/api/users/123');
