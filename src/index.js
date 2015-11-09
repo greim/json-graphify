@@ -13,5 +13,5 @@ export default function(opts) {
   function toGraph(json) {
     return converter.toGraph(json);
   }
-  return { toPathValues, toGraph };
+  return Object.freeze({ toPathValues, toGraph });
 }
