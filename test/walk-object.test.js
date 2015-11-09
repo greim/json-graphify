@@ -7,7 +7,6 @@
 
 import assert from 'assert';
 import { expensiveWalkObject } from '../src/walk-object';
-import _ from 'lodash';
 
 describe('walk-object', () => {
 
