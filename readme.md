@@ -18,12 +18,12 @@ You can then use a converter to transform JSON objects to conformant JSON graphs
 Typically, you'd create separate converters for every different type of object returned from your API.
 
 ```js
-import converter from 'json-graphify';
+import graphify from 'json-graphify';
 
 // Create an object that we can use to convert user
 // objects returned from the "/api/users/{id}" endpoint
 // into JSON graph output.
-export default const convertUser = converter({
+export default const convertUser = graphify({
 
   // Objects passed to this converter will
   // live in the top-level "usersById" hash
@@ -80,13 +80,13 @@ In that case we change our pattern to this:
 
 `$index` is a special placeholder value which matches any array index, AKA positive integer.
 
-## `convert.toPaths()`
+## `convert.toPathValues()`
 
-Usually you'll want to to turn a JSON object into an array of `{ path, value }` objects to be returned from a Falcor router, which is what the `toPaths()` method does.
+Usually you'll want to to turn a JSON object into an array of `{ path, value }` objects to be returned from a Falcor router, which is what this method does.
 
 ```js
 const user = await fetchJson('/api/users/123');
-const paths = convertUser.toPaths(user);
+const paths = convertUser.toPathValues(user);
 return paths;
 ```
 
@@ -105,7 +105,7 @@ Let's look at a full example contain a set of patterns, input JSON, and output J
 Here's the converter and the patterns upon instantiation.
 
 ```js
-const convertUser = converter({
+const convertUser = graphify({
   name: 'usersById',
   patterns: [
     { from: ['nemesis'], to: ['usersById','$id'] },
@@ -178,10 +178,10 @@ console.log(jsongFrag);
 
 # Example with Falcor Router
 
-To use in a router, return the result of the `toPaths()` method.
+To use in a router, return the result of the `toPathValues()` method.
 
 ```js
-const convertUser = converter({
+const convertUser = graphify({
   name: 'users',
   patterns: [ ... ]
 });
@@ -192,7 +192,7 @@ const MyRouter = FalcorRouter.createClass([{
     const ids = pathSet.ids;
     const userPromises = ids.map(id => fetchJson(`/api/users/${id}`));
     const rawUsers = yield Promise.all(userPromises);
-    return concat(rawUsers.map(convertUser.toPaths)); // <-- conversion!
+    return concat(rawUsers.map(convertUser.toPathValues)); // <-- conversion!
   }
 }]);
 

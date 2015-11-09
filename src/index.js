@@ -7,11 +7,11 @@ import Converter from './converter';
 
 export default function(opts) {
   const converter = new Converter(opts);
-  function toPaths(json) {
-    return converter.convert(json);
+  function toPathValues(json) {
+    return converter.toPathValues(json);
   }
   function toGraph(json) {
     return converter.toGraph(json);
   }
-  return { toPaths, toGraph };
+  return { toPathValues, toGraph };
 }

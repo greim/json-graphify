@@ -8,15 +8,9 @@ import createAmender from './create-amender';
 export default function compilePattern(pattern) {
 
   const newPattern = Object.assign({
-    idProp: 'id',
-    if: thing => thing && thing[newPattern.idProp] !== undefined
+    idProp: 'id'
   }, pattern);
 
-  if (typeof newPattern.if === 'string') {
-    const ifTypeof = newPattern.if;
-    newPattern.if = thing => typeof thing === ifTypeof;
-  }
-
   newPattern.amend = createAmender(newPattern);
-  return newPattern;
+  return Object.freeze(newPattern);
 }

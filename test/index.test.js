@@ -20,7 +20,7 @@ describe('index', () => {
 
   it('should convert with no refs', () => {
 
-    const converted = convert.toPaths({
+    const converted = convert.toPathValues({
       id: '1',
       username: 'foo'
     });
@@ -33,7 +33,7 @@ describe('index', () => {
 
   it('should convert with a ref', () => {
 
-    const converted = convert.toPaths({
+    const converted = convert.toPathValues({
       id: '1',
       username: 'foo',
       email: 'foo@example.com',
@@ -52,7 +52,7 @@ describe('index', () => {
 
   it('should convert with an array of refs', () => {
 
-    const converted = convert.toPaths({
+    const converted = convert.toPathValues({
       id: '1',
       username: 'foo',
       followers: [
@@ -76,7 +76,7 @@ describe('index', () => {
 
   it('should add a length to an amended path', () => {
 
-    const converted = convert.toPaths({
+    const converted = convert.toPathValues({
       id: '1',
       username: 'foo',
       followers: [
@@ -97,7 +97,7 @@ describe('index', () => {
 
   it('should not convert if id missing', () => {
 
-    const converted = convert.toPaths({
+    const converted = convert.toPathValues({
       id: '1',
       username: 'foo',
       followers: [ '2' ]
