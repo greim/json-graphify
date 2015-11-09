@@ -53,7 +53,7 @@ Here's an example:
 { from: ['avatar'], to: ['mediaById', '$id'] }
 ```
 
-The above means *move the `avatar` sub-object to the `mediaById` hash in the graph, leaving a $ref in its place.*
+The above means: *move the `avatar` sub-object to the `mediaById` hash in the graph, leaving a $ref in its place.*
 In the above, `$id` is a special placeholder that's replaced by the actual id at conversion time.
 If the avatar has an id property other than the usual "id", then you can add an `idAttribute` to the pattern to declare a custom id attribute.
 
@@ -76,6 +76,7 @@ The `avatar` object was hydrated into the user response by the REST API server, 
 Thus it makes sense to move the avatar object to the top level and leave behind a $ref to it, which is exactly what the above pattern does.
 
 The `from` path can also be adapted to handle arrays of things, using the special `$index` placeholder to match any positive integer.
+Supposing a user could have multiple avaters:
 
 ```js
 { from: ['avatars','$index'], to: ['mediaById','$id'] }
