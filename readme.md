@@ -55,10 +55,15 @@ Here's an example:
 { from: ['avatar'], to: ['mediaById', '$id'] }
 ```
 
-The above means *take the avatar sub-object and move it to the top-level `media` hash in the graph, leaving a $ref in its place.*
-In the above, `$id` is a special placeholder that will be replaced by the actual id at conversion time.
-(If the avatar has a different id property, e.g. `media_id`, then add `idProp: "media_id"` to the above.)
-For example, suppose your user objects have nested `avatar` properties like so:
+The above means *move the avatar sub-object to the `mediaById` hash in the graph, leaving a $ref in its place.*
+In the above, `$id` is a special placeholder that's replaced by the actual id at conversion time.
+If the avatar has an id property other than the usual "id", then you can add an `idProp` to declare a custom id attribute.
+
+```js
+{ from: ['avatar'], to: ['mediaById', '$id'], idProp: 'media_id' }
+```
+
+For example of patterns in action, suppose your user objects have nested `avatar` properties like so:
 
 ```js
 {
@@ -72,14 +77,11 @@ For example, suppose your user objects have nested `avatar` properties like so:
 The `avatar` object was hydrated into the user response by the REST API server, but could also have been fetched directly from `/api/media/2`.
 Thus it makes sense to move the avatar object to the top level and leave behind a $ref to it, which is exactly what the above pattern does.
 
-Now, what if instead of a singular `avatar`, we have an array of `avatars`?
-In that case we change our pattern to this:
+The `from` path can also be adapted to handle arrays of things, using the special `$index` placeholder to match any positive integer.
 
 ```js
 { from: ['avatars','$index'], to: ['mediaById','$id'] }
 ```
-
-`$index` is a special placeholder value which matches any array index, AKA positive integer.
 
 ## `convert.toPathValues()`
 
