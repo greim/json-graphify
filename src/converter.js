@@ -36,7 +36,7 @@ export default class {
         rawPath
       );
 
-      const isLeaf = typeof value !== 'object';
+      const isLeaf = typeof value !== 'object' || value === null;
 
       if (pattern) {
 
