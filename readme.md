@@ -106,6 +106,7 @@ Let's look at a full example containing patterns, input JSON, and output JSON Gr
 Here's the converter and the patterns upon instantiation.
 
 ```js
+// create a converter for user objects
 const convertUser = graphify({
   name: 'usersById',
   patterns: [
@@ -119,6 +120,7 @@ Here's the input JSON.
 Normally this would be fetched from a server but we'll just create it with literals.
 
 ```js
+// user object example
 const user = {
   id: '1',
   username: 'greim',
@@ -141,6 +143,7 @@ const user = {
 Now let's convert that to JSON graph using the rules declared above:
 
 ```js
+// convert the user object to a graph
 const jsongFrag = convertUser.toGraph(user);
 console.log(jsongFrag);
 
