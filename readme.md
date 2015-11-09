@@ -1,7 +1,7 @@
 # Convert Things to Falcor JSON Graph
 
-This makes it easy wrap pre-existing JSON REST APIs with Falcor.
-Particularly, when JSON responses contain nested sub-resources that you want to pull out and put at the top level of the graph.
+
+This makes it easy to get started with Falcor by exposing pre-existing JSON REST API endpoints as JSON graph objects.
 
 ## Install
 
@@ -13,9 +13,9 @@ npm install convert-to-jsong
 
 ### Main factory function
 
-This module exports a factory function.
-It creates a custom converter based on options you pass it.
-You can then use that converter to transform JSON objects to graphs.
+This module exports a factory function which creates custom converters based on options you pass to it.
+You can then use a converter to transform JSON objects to graphs.
+Typically, you'd create separate converters for every different type of object returned from your API.
 
 ```js
 import converter from 'convert-to-jsong';
@@ -23,7 +23,7 @@ import converter from 'convert-to-jsong';
 // Create an object that we can use to convert user
 // objects returned from the "/api/users/{id}" endpoint
 // into JSON graph output.
-const convertUser = converter({
+export default const convertUser = converter({
 
   // Objects passed to this converter will
   // live in the top-level "usersById" hash
