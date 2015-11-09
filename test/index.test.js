@@ -6,11 +6,11 @@
 /* eslint-env mocha */
 
 import assert from 'assert';
-import jsonConverter from '../src/index';
+import createConverter from '../src/index';
 
 describe('index', () => {
 
-  const converter = jsonConverter({
+  const convert = createConverter({
     name: 'users',
     patterns: [
       { from: ['followers','$index'], to: ['users','$id'] },
@@ -20,7 +20,7 @@ describe('index', () => {
 
   it('should convert with no refs', () => {
 
-    const converted = converter({
+    const converted = convert.toPaths({
       id: '1',
       username: 'foo'
     });
@@ -33,7 +33,7 @@ describe('index', () => {
 
   it('should convert with a ref', () => {
 
-    const converted = converter({
+    const converted = convert.toPaths({
       id: '1',
       username: 'foo',
       email: 'foo@example.com',
@@ -52,7 +52,7 @@ describe('index', () => {
 
   it('should convert with an array of refs', () => {
 
-    const converted = converter({
+    const converted = convert.toPaths({
       id: '1',
       username: 'foo',
       followers: [
@@ -75,7 +75,7 @@ describe('index', () => {
 
   it('should not convert if id missing', () => {
 
-    const converted = converter({
+    const converted = convert.toPaths({
       id: '1',
       username: 'foo',
       followers: [ '2' ]
@@ -91,7 +91,7 @@ describe('index', () => {
 
   it('should convert to JSON graph', () => {
 
-    const converted = converter.toGraph({
+    const converted = convert.toGraph({
       id: '1',
       username: 'foo',
       followers: [{

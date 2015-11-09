@@ -1,19 +1,29 @@
 # Convert Things to Falcor JSON Graph
 
-This utility makes it easy wrap pre-existing JSON REST APIs with Falcor.
+This makes it easy wrap pre-existing JSON REST APIs with Falcor.
 Particularly, when JSON responses contain nested sub-resources that you want to pull out and put at the top level of the graph.
 
-## Creating a converter
+## Install
 
-You create a converter once and keep it around in memory, re-using it to transfor JSON responses to your desired graph format.
+```
+npm install convert-to-jsong
+```
+
+## API Documentation
+
+### Main factory function
+
+This module exports a factory function.
+It creates a custom converter based on options you pass it.
+You can then use that converter to transform JSON objects to graphs.
 
 ```js
-import createConverter from 'convert-to-jsong';
+import converter from 'convert-to-jsong';
 
 // Create an object that we can use to convert user
 // objects returned from the "/api/users/{id}" endpoint
 // into JSON graph output.
-const userConverter = createConverter({
+const convertUser = converter({
 
   // Objects passed to this converter will
   // live in the top-level "usersById" hash
@@ -27,24 +37,26 @@ const userConverter = createConverter({
 
   // These declarative patterns control the
   // transformation from the existing object
-  // structure to JSON graph. More details below.
+  // structure to JSON graph. See "pattern objects"
+  // below for more details.
   patterns: [ ... ]
 });
 ```
 
-## Using a converter
+### Pattern objects
 
-To use a converter, simply pass your JSON object to its `convert()` method.
+A pattern object is an object with the shape `{ from, to }`.
+`from` is a path (an array of strings) matching things found in JSON objects that will be converted.
+`to` is a corresponding path of where to place the thing in the resultant JSON graph.
+Here's an example:
 
 ```js
-const user = await fetchJson('/api/users/123');
-const jsonGraphFragment = userConverter.toGraph(userObject);
-// return jsonGraphFragment from a Falcor router
+{ from: ['avatar'], to: ['media', '$id'] }
 ```
 
-## Patterns in depth
-
-Suppose your user objects have nested `avatar` properties like so:
+The above means *take the avatar sub-object and move it to the top-level `media` hash in the graph, leaving a $ref in its place.*
+In the above, `$id` is a special placeholder that will be replaced by the actual id at conversion time.
+For example, suppose your user objects have nested `avatar` properties like so:
 
 ```js
 {
@@ -56,16 +68,7 @@ Suppose your user objects have nested `avatar` properties like so:
 ```
 
 The `avatar` object was hydrated into the user response by the REST API server, but could also have been fetched directly from `/api/media/2`.
-Classic resource nesting problem which is solved by JSON graph.
-But we need to construct a pattern to pull it out and place it into the graph.
-Here's the pattern:
-
-```js
-{ from: ['avatar'], to: ['mediaById','$id'] }
-```
-
-`from` and `to` are both paths.
-`$id` is a special placeholder which will be substituted with the actual id at conversion time.
+Since we want to have its own representation in the JSON graph, we use the above pattern.
 
 But what if instead of a singular `avatar`, we have an array of `avatars`?
 In that case we change our pattern to:
@@ -76,13 +79,33 @@ In that case we change our pattern to:
 
 `$index` is once again a special placeholder value which matches any positive integer (i.e. an array index).
 
+### `convert.toGraph()`
+
+To turn a JSON object into a graph, pass your JSON object to the `toGraph()` method.
+
+```js
+const user = await fetchJson('/api/users/123');
+const jsongFrag = convertUser.toGraph(user);
+```
+
+### `convert.toPaths()`
+
+To turn a JSON object into a thing suitable to be returned from a Falcor router, use the `toPaths()` method.
+In other words, an array of objects with the shape `{ path, value }`.
+
+```js
+const user = await fetchJson('/api/users/123');
+const paths = convertUser.toPaths(user);
+return paths;
+```
+
 ## Conversion example
 
 Let's look at a full example contain a set of patterns, input JSON, and output JSON graph all together.
 Here's the converter and the patterns upon instantiation.
 
 ```js
-const userConverter = createConverter({
+const convertUser = converter({
   name: 'usersById',
   patterns: [
     { from: ['nemesis'], to: ['usersById','$id'] },
@@ -92,7 +115,7 @@ const userConverter = createConverter({
 ```
 
 Here's the input JSON.
-Normally this would be fetched from a server but we'll just create it with object literals.
+Normally this would be fetched from a server but we'll just create it with literals.
 
 ```js
 const user = {
@@ -117,8 +140,8 @@ const user = {
 Now let's convert that to JSON graph using the rules declared above:
 
 ```js
-const jsonGraphFragment = userConverter.toGraph(user);
-console.log(jsonGraphFragment);
+const jsongFrag = convertUser.toGraph(user);
+console.log(jsongFrag);
 
 // output
 {
