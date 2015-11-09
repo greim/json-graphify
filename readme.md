@@ -185,11 +185,13 @@ console.log(jsongFrag);
 To use in a router, return the result of the `toPathValues()` method.
 
 ```js
+// create a converter for users
 const convertUser = graphify({
   name: 'users',
   patterns: [ ... ]
 });
 
+// create a falcor router
 const MyRouter = FalcorRouter.createClass([{
   route: "users[{keys:ids}]",
   get: async function(pathSet) {
@@ -200,6 +202,7 @@ const MyRouter = FalcorRouter.createClass([{
   }
 }]);
 
+// array concatenation util
 function concat(arrs) {
   return arrs.reduce((a, b) => a.concat(b), []);
 }
