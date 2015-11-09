@@ -1,7 +1,6 @@
 # Convert Things to Falcor JSON Graph
 
-This makes it easy to bring [Falcor](http://netflix.github.io/falcor/) into non-greenfield projects.
-It does so by transforming objects obtained from pre-existing JSON REST APIs into conformant [JSON Graph](http://netflix.github.io/falcor/documentation/jsongraph.html) objects.
+This makes it easy to bring [Falcor](http://netflix.github.io/falcor/) into established projects, by transforming existing JSON REST responses into conformant [JSON Graph](http://netflix.github.io/falcor/documentation/jsongraph.html) objects.
 
 # Install
 
@@ -13,9 +12,9 @@ npm install json-graphify
 
 ## Main factory function
 
-This module exports a factory function which creates custom converters based on options you pass to it.
-You can then use a converter to transform JSON objects to conformant JSON graphs.
-Typically, you'd create separate converters for every different type of object returned from your API.
+This module exports a factory function which creates an object transformer based a set of declarative rules you provide.
+That converter then transforms JSON objects into conformant JSON graphs.
+You can create a separate converter for each different type returned from your API.
 
 ```js
 import graphify from 'json-graphify';
@@ -35,10 +34,9 @@ export default const convertUser = graphify({
   // Optional. Defaults to "id".
   idAttribute: 'id',
 
-  // These declarative patterns control the
-  // transformation from the existing object
-  // structure to JSON graph. See "pattern objects"
-  // below for more details.
+  // These declarations control the transformation
+  // from the existing object structure to JSON graph.
+  // See "pattern objects" below for more details.
   patterns: [ ... ]
 });
 ```
