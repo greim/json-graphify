@@ -3,7 +3,9 @@
  * MIT License. See mit-license.txt for more info.
  */
 
-export default function(match, patterns, path) {
+import match from './match-paths';
+
+export default function(patterns, path) {
   for (let pattern of patterns) {
     if (match(pattern.from, path)) {
       return pattern;

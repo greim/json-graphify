@@ -6,11 +6,12 @@
 /* eslint-env mocha */
 
 import assert from 'assert';
-import createConverter from '../src/index';
+import graphify from '../src/index';
+import $ref from '../src/ref';
 
 describe('index', () => {
 
-  const convert = createConverter({
+  const convert = graphify({
     name: 'users',
     patterns: [
       { from: ['followers','$index'], to: ['users','$id'] },
@@ -112,7 +113,7 @@ describe('index', () => {
 
   it('should convert using literal indices', () => {
 
-    const converted = createConverter({
+    const converted = graphify({
       name: 'users',
       patterns: [
         { from: ['followers', 0], to: ['users','$id'] }
@@ -190,6 +191,26 @@ describe('index', () => {
         '4': {
           id: '4',
           src: 'http://media.example.com/123.jpg'
+        }
+      }
+    });
+  });
+
+  it('should operate', () => {
+
+    const converted = graphify({
+      name: 'users',
+      operations: [{ select: [ 'nemesis' ], edit: id => $ref([ 'users', id ]) }]
+    }).toGraph({
+      id: '1',
+      nemesis: '2'
+    });
+
+    assert.deepEqual(converted, {
+      users: {
+        '1': {
+          id: '1',
+          nemesis: $ref([ 'users', 2 ])
         }
       }
     });

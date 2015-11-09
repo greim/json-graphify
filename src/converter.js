@@ -4,10 +4,11 @@
  */
 
 import walkObject from './walk-object';
-import createMatcher from './create-matcher';
 import findPattern from './find-pattern';
 import compilePattern from './compile-pattern';
 import $ref from './ref';
+import deepFreeze from 'deep-freeze';
+import operate from './operate';
 
 export default class {
 
@@ -15,14 +16,17 @@ export default class {
     opts = Object.assign({
       $index: '$index',
       $key: '$key',
-      idAttribute: 'id'
+      idAttribute: 'id',
+      patterns: [],
+      operations: []
     }, opts);
     opts.patterns = opts.patterns.map(compilePattern);
-    opts.match = createMatcher(opts);
-    this._opts = Object.freeze(opts);
+    this._opts = deepFreeze(opts);
   }
 
   toPathValues(obj) {
+
+    operate(obj, this._opts.operations);
 
     // this will be returned
     const result = [];
@@ -31,18 +35,19 @@ export default class {
     const prepend = [ this._opts.name, obj[this._opts.idAttribute] ];
 
     // walk the object tree
-    for (const { parents, path: rawPath, value } of walkObject(obj)) {
-
-      const isLeaf = typeof value !== 'object' || value === null;
+    for (let { parents, path: rawPath, value, isLeaf } of walkObject(obj)) {
 
       // if pattern exists, there was a match
       const pattern = findPattern(
-        this._opts.match,
         this._opts.patterns,
         rawPath
       );
 
       if (pattern) {
+
+        // if lengths match, `value` is the root of a subtree
+        // which is being amended.
+        const isSubroot = pattern.from.length === rawPath.length;
 
         // this is how we know what id to use
         const idBearer = parents[pattern.from.length] || value;
@@ -50,11 +55,9 @@ export default class {
 
         if (id !== undefined) {
 
-          if (pattern.from.length === rawPath.length) {
+          if (isSubroot) {
 
-            // if lengths match, `value` is the root of a subtree
-            // which is being amended to the top of the graph
-            // and a $ref left in its place
+            // this subroot is being moved, and a $ref left in its wake
             const pathA = prepend.concat(rawPath);
             const pathB = rawPath.slice();
             pattern.amend(pathB, id);

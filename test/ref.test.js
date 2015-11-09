@@ -9,6 +9,7 @@ import assert from 'assert';
 import $ref from '../src/ref';
 
 describe('ref', () => {
+
   it('should return a valid ref', () => {
     const $type = 'ref';
     const value = [ 'foo', 'bar' ];

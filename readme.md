@@ -34,6 +34,12 @@ export default const convertUser = graphify({
   // Optional. Defaults to "id".
   idAttribute: 'id',
 
+  // these declarations describe arbitrary operations
+  // on incoming JSON objects prior to being transformed
+  // into graphs. See "operation objects" below for more
+  // details.
+  operations: [ ... ],
+
   // These declarations control the transformation
   // from the existing object structure to JSON graph.
   // See "pattern objects" below for more details.
@@ -82,6 +88,39 @@ Supposing a user could have multiple avaters:
 { from: ['avatars','$index'], to: ['mediaById','$id'] }
 ```
 
+## Operation objects
+
+An array of these are passed as an option to the factory method (see above).
+An operation object is an object with the shape `{ select, edit }`.
+`select` is an array of strings matching one or more sub-roots in the JSON object.
+`edit` is a mapping function which accepts an existing value and returns a new value.
+
+For example, suppose your user object contains a `followers` array of id strings.
+You can use an operation to convert those followers to Falcor references:
+
+```js
+// raw user JSON object
+{
+  id: '1'
+  username: 'greim',
+  email: 'greim@example.com',
+  followers: [ '2', '3' ]
+}
+
+// operation
+{ select: [ 'followers', '$index' ], edit: id => $ref([ 'users', id ]) }
+
+// modified JSON object
+{
+  username: 'greim',
+  email: 'greim@example.com',
+  followers: [
+    { $type: 'ref', value: [ 'users', '123' ],
+    { $type: 'ref', value: [ 'users', '456' ]
+  ]
+}
+```
+
 ## `convert.toPathValues()`
 
 Usually you'll want to to turn a JSON object into an array of `{ path, value }` objects to be returned from a Falcor router, which is what this method does.
@@ -101,6 +140,9 @@ This might be useful for example in boostrapping a client-side Falcor Model cach
 const user = await fetchJson('/api/users/123');
 const jsongFrag = convertUser.toGraph(user);
 ```
+
+```js
+import { operate } from 'json-graphify';
 
 # Conversion example
 

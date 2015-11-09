@@ -5,7 +5,7 @@
 
 import Converter from './converter';
 
-export default function(opts) {
+export default function graphify(opts) {
   const converter = new Converter(opts);
   function toPathValues(json) {
     return converter.toPathValues(json);

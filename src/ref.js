@@ -3,6 +3,6 @@
  * MIT License. See mit-license.txt for more info.
  */
 
-export default function(value) {
+export default function ref(value) {
   return { $type: 'ref', value };
 }

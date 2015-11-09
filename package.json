@@ -1,6 +1,6 @@
 {
   "name": "json-graphify",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "Convert Legacy JSON Objects to JSON Graph",
   "main": "lib/index.js",
   "scripts": {

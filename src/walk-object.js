@@ -3,6 +3,8 @@
  * MIT License. See mit-license.txt for more info.
  */
 
+ import $ref from './ref';
+
 /*
  * Recursively iterate through every node in a JSON object tree.
  */
@@ -10,45 +12,51 @@
 export default function* walkObj(obj, parents, path) {
   parents = parents || [];
   path = path || [];
-  if (typeof obj === 'object') {
+  if (!isLeafNode(obj)) {
     parents.push(obj);
-
-    if (Array.isArray(obj)) {
-
-      for (let idx=0; idx<obj.length; idx++) {
-        const child = obj[idx];
-        path.push(idx);
-        yield { parents, path, value: child };
-        if (typeof child === 'object') {
-          yield* walkObj(child, parents, path);
-        }
-        path.pop();
-      }
-    } else {
-
-      for (const key in obj) {
-        if (!obj.hasOwnProperty(key)) { continue; }
-        const child = obj[key];
-        path.push(key);
-        yield { parents, path, value: child };
-        if (typeof child === 'object') {
-          yield* walkObj(child, parents, path);
-        }
-        path.pop();
-      }
+    for (const { key, value } of iterate(obj)) {
+      path.push(key);
+      const isLeaf = isLeafNode(value);
+      yield { parents, path, value, isLeaf };
+      yield* walkObj(obj[key], parents, path);
+      path.pop();
     }
-
     parents.pop();
   }
 }
 
+export const isLeafNode = (() => {
+  const $jsongLeafTypes = new Set([ 'ref', 'atom', 'error' ]);
+  const $branchTypes = new Set([ 'object' ]);
+  return function(thing) {
+    const isLeaf = !thing || !$branchTypes.has(typeof thing);
+    const isJsongLeaf = !!thing && $jsongLeafTypes.has(thing.$type);
+    return isLeaf || isJsongLeaf;
+  };
+})();
+
+
 // just for testing
 export function* expensiveWalkObject(...args) {
-  for (const { parents, path, value } of walkObj(...args)) {
-    yield {
-      parents: parents.slice(),
-      path: path.slice(),
-      value
-    };
+  for (const thing of walkObj(...args)) {
+    thing.parents = thing.parents.slice();
+    thing.path = thing.path.slice();
+    yield thing;
+  }
+}
+
+// object/array agnostic iterator
+function* iterate(thing) {
+  if (Array.isArray(thing)) {
+    for (let key=0; key<thing.length; key++) {
+      const value = thing[key];
+      yield { key, value };
+    }
+  } else {
+    for (const key in thing) {
+      if (!thing.hasOwnProperty(key)) { continue; }
+      const value = thing[key];
+      yield { key, value };
+    }
   }
 }
