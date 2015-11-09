@@ -102,7 +102,7 @@ const jsongFrag = convertUser.toGraph(user);
 
 # Conversion example
 
-Let's look at a full example contain a set of patterns, input JSON, and output JSON graph all together.
+Let's look at a full example containing patterns, input JSON, and output JSON Graph all together.
 Here's the converter and the patterns upon instantiation.
 
 ```js
