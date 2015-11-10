@@ -38,6 +38,11 @@ export default class {
     // walk the object tree
     for (let { parents, path: rawPath, value, isLeaf } of walkObject(obj)) {
 
+      // skip the root node visit
+      if (parents.length === 0) {
+        continue;
+      }
+
       // if a move exists, there was a match
       const move = findMove(
         this._opts.move,

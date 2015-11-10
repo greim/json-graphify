@@ -9,16 +9,20 @@
  * Recursively iterate through every node in a JSON object tree.
  */
 
-export default function* walkObj(obj, parents, path) {
+export default function* walkObj(value, parents, path, parent, key) {
   parents = parents || [];
   path = path || [];
-  if (!isLeafNode(obj)) {
-    parents.push(obj);
-    for (const { key, value } of iterate(obj)) {
+  let isLeaf = isLeafNode(value);
+  yield { parents, path, value, isLeaf };
+  // in case there was a mutation over the yield
+  value = parent !== undefined ? parent[key] : value;
+  isLeaf = isLeafNode(value);
+  if (!isLeaf) {
+    parents.push(value);
+    for (const { key, child } of iterate(value)) {
       path.push(key);
-      const isLeaf = isLeafNode(value);
-      yield { parents, path, value, isLeaf };
-      yield* walkObj(obj[key], parents, path);
+      const isLeaf = isLeafNode(child);
+      yield* walkObj(value[key], parents, path, value, key);
       path.pop();
     }
     parents.pop();
@@ -49,14 +53,14 @@ export function* expensiveWalkObject(...args) {
 function* iterate(thing) {
   if (Array.isArray(thing)) {
     for (let key=0; key<thing.length; key++) {
-      const value = thing[key];
-      yield { key, value };
+      const child = thing[key];
+      yield { key, child };
     }
   } else {
     for (const key in thing) {
       if (!thing.hasOwnProperty(key)) { continue; }
-      const value = thing[key];
-      yield { key, value };
+      const child = thing[key];
+      yield { key, child };
     }
   }
 }

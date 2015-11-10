@@ -63,4 +63,10 @@ describe('munge', () => {
     }]);
     assert.deepEqual(obj, { a: 'a', b: { c: false } });
   });
+
+  it('should mutate the root item', () => {
+    const obj = ['a','b','c'];
+    munge(obj, [{ select: [], edit: root => root.push('d') }]);
+    assert.deepEqual(obj, ['a','b','c','d']);
+  });
 });

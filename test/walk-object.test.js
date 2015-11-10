@@ -50,29 +50,40 @@ describe('walk-object', () => {
     });
   });
 
-  it('should do nothing for an empty object', () => {
-    assert.deepEqual([...expensiveWalkObject({})], []);
+  it('should iterate once for an empty object', () => {
+    assert.deepEqual([...expensiveWalkObject({})], [
+      { parents: [], path: [], value: {}, isLeaf: false }
+    ]);
   });
 
-  it('should do nothing for an empty array', () => {
-    assert.deepEqual([...expensiveWalkObject([])], []);
+  it('should iterate once for an empty array', () => {
+    assert.deepEqual([...expensiveWalkObject([])], [
+      { parents: [], path: [], value: [], isLeaf: false }
+    ]);
   });
 
-  it('should do nothing for undefined', () => {
-    assert.deepEqual([...expensiveWalkObject(undefined)], []);
+  it('should iterate once for undefined', () => {
+    assert.deepEqual([...expensiveWalkObject(undefined)], [
+      { parents: [], path: [], value: undefined, isLeaf: true }
+    ]);
   });
 
-  it('should do nothing for null', () => {
-    assert.deepEqual([...expensiveWalkObject(null)], []);
+  it('should iterate once for null', () => {
+    assert.deepEqual([...expensiveWalkObject(null)], [
+      { parents: [], path: [], value: null, isLeaf: true }
+    ]);
   });
 
-  it('should do nothing for a primitive', () => {
-    assert.deepEqual([...expensiveWalkObject(1)], []);
+  it('should iterate once for a primitive', () => {
+    assert.deepEqual([...expensiveWalkObject(1)], [
+      { parents: [], path: [], value: 1, isLeaf: true }
+    ]);
   });
 
   it('should walk top-level props', () => {
     const result = [...expensiveWalkObject({ a:1, b:2 })];
     assert.deepEqual(result, [
+      { path: [], value: { a:1, b:2 }, parents: [], isLeaf: false },
       { path: ['a'], value: 1, parents: [{ a:1, b:2 }], isLeaf: true },
       { path: ['b'], value: 2, parents: [{ a:1, b:2 }], isLeaf: true }
     ]);
@@ -81,6 +92,7 @@ describe('walk-object', () => {
   it('should walk top-level array items', () => {
     const result = [...expensiveWalkObject([2,4])];
     assert.deepEqual(result, [
+      { path: [], value: [2,4], parents: [], isLeaf: false },
       { path: [0], value: 2, parents: [[2,4]], isLeaf: true },
       { path: [1], value: 4, parents: [[2,4]], isLeaf: true }
     ]);
@@ -89,6 +101,7 @@ describe('walk-object', () => {
   it('should pass null as a value', () => {
     const result = [...expensiveWalkObject([null])];
     assert.deepEqual(result, [
+      { path: [], value: [null], parents: [], isLeaf: false },
       { path: [0], value: null, parents: [[null]], isLeaf: true }
     ]);
   });
@@ -96,6 +109,7 @@ describe('walk-object', () => {
   it('should go two levels deep', () => {
     const result = [...expensiveWalkObject([{a:1},3])];
     assert.deepEqual(result, [
+      { path: [], value: [{a:1},3], parents: [], isLeaf: false },
       { path: [0], value: {a:1}, parents: [[{a:1},3]], isLeaf: false },
       { path: [0,'a'], value: 1, parents: [[{a:1},3], {a:1}], isLeaf: true },
       { path: [1], value: 3, parents: [[{a:1},3]], isLeaf: true }
