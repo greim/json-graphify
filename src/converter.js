@@ -57,7 +57,7 @@ export default class {
 
         // this is how we know what id to use
         const idBearer = parents[move.from.length] || value;
-        const id = idBearer[move.idAttribute];
+        const id = idBearer && idBearer[move.idAttribute];
 
         if (id !== undefined) {
 

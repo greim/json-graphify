@@ -96,6 +96,26 @@ describe('index', () => {
     ]);
   });
 
+  it.skip('should not fail on null', () => {
+
+    const converted = convert.toPathValues({
+      id: '1',
+      username: 'foo',
+      followers: [
+        null
+      ]
+    });
+
+    console.log(JSON.stringify(converted));
+
+    assert.deepEqual(converted, [
+      { path: ['users', '1', 'id'], value: '1' },
+      { path: ['users', '1', 'username'], value: 'foo' },
+      { path: ['users', '1', 'followers', 'length'], value: 1 },
+      { path: ['users', '1', 'followers', 0], value: { $type: 'atom', value: null } }
+    ]);
+  });
+
   it('should not convert if id missing', () => {
 
     const converted = convert.toPathValues({
