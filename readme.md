@@ -14,7 +14,7 @@ npm install json-graphify
 import graphify from 'json-graphify';
 
 const convertUser = graphify({
-  to: 'usersById',
+  name: 'usersById',
   munge: [{
     select: [ 'avatar' ],
     edit: id => $ref(['mediaById', id])
