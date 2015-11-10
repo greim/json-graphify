@@ -69,4 +69,14 @@ describe('munge', () => {
     munge(obj, [{ select: [], edit: root => root.push('d') }]);
     assert.deepEqual(obj, ['a','b','c','d']);
   });
+
+  it('should pass parent', () => {
+    const obj = ['a','b','c'];
+    function edit(val, parent) {
+      assert.deepEqual(parent, ['a','b','c']);
+      return val.toUpperCase();
+    }
+    munge(obj, [{ select: [0], edit }]);
+    assert.deepEqual(obj, ['A','b','c']);
+  });
 });
