@@ -13,6 +13,8 @@ npm install json-graphify
 ```js
 import graphify from 'json-graphify';
 
+// this will be used to convert user
+// objects into JSON Graph fragments
 const convertUser = graphify({
   name: 'usersById',
   munge: [{
@@ -25,6 +27,8 @@ const convertUser = graphify({
   }]
 });
 
+// example of a user object returned
+// from a REST API
 const user = {
   id: '1',
   username: 'superman',
@@ -32,11 +36,11 @@ const user = {
   alter_ego: { id: '3', username: 'lexluthor' }
 };
 
+// convert it to JSON Graph
 const jsong = convertUser.toGraph(user);
 
 console.log(user);
-
-// Output JSON Graph
+// output graph
 {
   usersById: {
     1: {
