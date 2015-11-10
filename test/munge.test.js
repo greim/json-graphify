@@ -51,4 +51,16 @@ describe('munge', () => {
     munge(obj, [{ select: ['b','$index'], edit: () => undefined }]);
     assert.deepEqual(obj, {a:'a',b:[undefined,undefined]});
   });
+
+  it('should munge its own munges', () => {
+    const obj = { a: 'a', b: null };
+    munge(obj, [{
+      select: ['b'],
+      edit: () => ({ c: true })
+    }, {
+      select: ['b','c'],
+      edit: val => !val
+    }]);
+    assert.deepEqual(obj, { a: 'a', b: { c: false } });
+  });
 });
