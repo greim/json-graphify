@@ -96,7 +96,7 @@ describe('index', () => {
     ]);
   });
 
-  it.skip('should not fail on null', () => {
+  it('should not fail on null', () => {
 
     const converted = convert.toPathValues({
       id: '1',
@@ -105,8 +105,6 @@ describe('index', () => {
         null
       ]
     });
-
-    console.log(JSON.stringify(converted));
 
     assert.deepEqual(converted, [
       { path: ['users', '1', 'id'], value: '1' },
@@ -124,10 +122,34 @@ describe('index', () => {
       followers: [ '2' ]
     });
 
+    //console.log(JSON.stringify(converted));
+
     assert.deepEqual(converted, [
       { path: ['users', '1', 'id'], value: '1' },
       { path: ['users', '1', 'username'], value: 'foo' },
-      { path: ['users', '1', 'followers', 'length'], value: 1 }
+      { path: ['users', '1', 'followers', 'length'], value: 1 },
+      { path: ['users', '1', 'followers', 0], value: { $type: 'atom', value: 2 } }
+    ]);
+  });
+
+  it('should atomize objects missing ids', () => {
+
+    // this is likely an error condition on the part
+    // of the user but we need to do something
+    // minimally destructive
+
+    const converted = convert.toPathValues({
+      id: '1',
+      username: 'foo',
+      logo: { yes: 'foo' }
+    });
+
+    //console.log(JSON.stringify(converted));
+
+    assert.deepEqual(converted, [
+      { path: ['users', '1', 'id'], value: '1' },
+      { path: ['users', '1', 'username'], value: 'foo' },
+      { path: ['users', '1', 'logo'], value: { $type: 'atom', value: { yes: 'foo' } } }
     ]);
   });
 

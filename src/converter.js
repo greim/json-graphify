@@ -25,85 +25,64 @@ export default class {
     this._opts = deepFreeze(opts);
   }
 
+
+
+
+
+
+
+
   toPathValues(obj) {
 
     munge(obj, this._opts.munge);
-
-    // this will be returned
     const result = [];
-
-    // prepend this to every non-amended path
     const prepend = [ this._opts.name, obj[this._opts.idAttribute] ];
 
-    // walk the object tree
-    for (let { parents, path: rawPath, value, isLeaf } of walkObject(obj)) {
-
-      // skip the root node visit
-      if (parents.length === 0) {
-        continue;
-      }
-
-      // if a move exists, there was a match
-      const move = findMove(
-        this._opts.move,
-        rawPath
-      );
-
+    for (let { parents, path, value, isLeaf } of walkObject(obj)) {
+      if (parents.length === 0) { continue; }
+      const move = findMove(this._opts.move, path);
+      let amended = false;
       if (move) {
-
-        // if lengths match, `value` is the root of a subtree
-        // which is being amended.
-        const isSubroot = move.from.length === rawPath.length;
-
-        // this is how we know what id to use
+        const isSubroot = move.from.length === path.length;
         const idBearer = parents[move.from.length] || value;
-        const id = idBearer && idBearer[move.idAttribute];
-
+        const id = idBearer ? idBearer[move.idAttribute] : undefined;
         if (id !== undefined) {
-
+          const origPath = path;
+          path = path.slice();
+          move.amend(path, id);
+          amended = true;
           if (isSubroot) {
-
-            // this subroot is being moved, and a $ref left in its wake
-            const pathA = prepend.concat(rawPath);
-            const pathB = rawPath.slice();
-            move.amend(pathB, id);
-            result.push({ path: pathA, value: $ref(pathB) });
+            result.push({ path: prepend.concat(origPath), value: $ref(path) });
           }
-
-          if (isLeaf) {
-
-            // if value is a leaf node, generate an amended result
-            const path = rawPath.slice();
-            move.amend(path, id);
-            result.push({ path, value });
-
-          } else if (Array.isArray(value)) {
-
-            // for sub-arrays, generate an amended length result
-            const path = rawPath.slice();
-            path.push('length');
-            move.amend(path, id);
-            result.push({ path, value: value.length });
-          }
+        } else {
+          value = { $type: 'atom', value };
+          const parent = parents[parents.length - 1];
+          const prop = path[path.length - 1];
+          parent[prop] = value;
+          isLeaf = true;
         }
-      } else if (isLeaf) {
-
-        // if value is a leaf, generate a result
-        const path = prepend.concat(rawPath);
+      }
+      if (!amended) {
+        path = prepend.concat(path);
+      }
+      if (isLeaf) {
         result.push({ path, value });
-
       } else if (Array.isArray(value)) {
-
-        // for sub-arrays, generate a length result
-        const path = prepend.concat(rawPath);
         path.push('length');
         result.push({ path, value: value.length });
       }
     }
 
-    // fin
     return result;
   }
+
+
+
+
+
+
+
+
 
   toGraph(obj) {
     const paths = this.toPathValues(obj);
