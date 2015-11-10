@@ -8,6 +8,51 @@ This makes it easy to bring [Falcor](http://netflix.github.io/falcor/) into esta
 npm install json-graphify
 ```
 
+# Example
+
+```js
+import graphify from 'json-graphify';
+
+const convertUser = graphify({
+  name: 'users',
+  munge: [{
+    select: [ 'avatar' ],
+    edit: id => $ref(['mediaById', id])
+  }],
+  move: [{
+    from: [ 'alter_ego' ],
+    to: [ 'usersById', '$id' ]
+  }]
+});
+
+const user = {
+  id: '1',
+  username: 'superman',
+  avatar: '2',
+  alter_ego: { id: '3', username: 'lexluthor' }
+};
+
+const jsong = convertUser.toGraph(user);
+
+console.log(user);
+
+// Output JSON Graph
+{
+  usersById: {
+    1: {
+      id: '1',
+      username: 'superman',
+      avatar: { $type: 'ref', value: [ 'mediaById' , '2' ] },
+      alter_ego: { $type: 'ref', value: [ 'usersById' , '3' ] }
+    },
+    3: {
+      id: '3',
+      username: 'lexluthor'
+    }
+  }
+}
+```
+
 # API Documentation
 
 ## Main factory function
@@ -50,110 +95,49 @@ export default const convertUser = graphify({
 ## Move objects
 
 An array of these are passed as an option to the factory method (see above).
-A move object is an object with the shape `{ from, to }`.
-`from` is a path (an array of strings) matching sub-roots found in incoming JSON objects.
-`to` is another path pointing to the sub-root's new home in the resultant JSON graph.
-Here's an example:
+A move object has the form `{ from, to }`.
+`from` is a path from the root of the input object, which matches zero or more sub-roots in the object tree.
+`to` is a path from the root of the output graph, pointing to those subtrees' new home.
 
 ```js
 {
-  from: ['avatar'],
-  to: ['mediaById', '$id']
-}
-```
+  // `$index` matches any positive integer, thus
+  // if the incoming object has an `avatars` array,
+  // this path will match every item in it.
+  from: [ 'avatars', '$index' ],
 
-The above means: *move the `avatar` sub-object to the `mediaById` hash in the graph, leaving a $ref in its place.*
-In the above, `$id` is a special placeholder that's replaced by the actual id at conversion time.
-If the avatar has an id property other than the usual "id", then you can add an `idAttribute` to declare a custom id attribute.
-
-```js
-{
-  from: ['avatar'],
-  to: ['mediaById', '$id'],
-  idAttribute: 'media_id'
-}
-```
-
-For an example of move objects in action, suppose your user objects have nested `avatar` properties like so:
-
-```js
-// raw json
-const user = {
-  id: '1',
-  username: 'greim',
-  email: 'greim@example.com',
-  avatar: { id: '2', src: 'http://media.example.com/a45s3c.jpg' }
-};
-
-// converter
-const convertUser = graphify({
-  name: 'usersById',
-  move: [{
-    from: ['avatars','$index'],
-    to: ['mediaById','$id']
-  }]
-})
-
-console.log(convertUser.toGraph(user));
-
-// result
-{
-  usersById: {
-    '1': {
-      id: '1',
-      username: 'greim',
-      email: 'greim@example.com',
-      avatar: { $type: 'ref', value: [ 'mediaById', '2' ] }
-    }
-  },
-  mediaById: {
-    '2': {
-      id: '2',
-      src: 'http://media.example.com/a45s3c.jpg'
-    }
-  }
+  // `$id` will be replaced by the avatar object's
+  // `id` attribute, creating an `mediaById` hash
+  // in the output graph.
+  to: [ 'mediaById', '$id' ]
 }
 ```
 
 ## Munge objects
 
 An array of these are passed as an option to the factory method (see above).
-A munge object is an object with the shape `{ select, edit }`.
-`select` is a path (an array of strings) matching one or more sub-roots in the JSON object.
-`edit` is a mapping function which accepts an existing value and returns a new value.
-
-For example, suppose your user object contains a `followers` array of id strings.
-You can use a munge to convert those followers to Falcor references:
+A munge object has the form `{ select, edit }`.
+`select` is a path from the root of the input object, which matches zero or more sub-roots in the object tree.
+`edit` is a function which operates on the found value.
+Whatever `edit` returns becomes the new value.
+If it returns `undefined`, the value is deleted.
 
 ```js
-// raw user JSON object
 {
-  id: '1'
-  username: 'greim',
-  email: 'greim@example.com',
-  followers: [ '2', '3' ]
-}
+  // if the input object has an `avatar` property
+  // this selector will match it.
+  select: [ 'avatar' ],
 
-// munge
-{
-  select: [ 'followers', '$index' ],
-  edit: id => $ref([ 'users', id ])
-}
-
-// modified JSON object
-{
-  username: 'greim',
-  email: 'greim@example.com',
-  followers: [
-    { $type: 'ref', value: [ 'users', '2' ],
-    { $type: 'ref', value: [ 'users', '3' ]
-  ]
+  // the value of `inputObject.avatar` is passed to
+  // this function, which converts it to a JSON
+  // graph reference.
+  edit: id => ({ $type: 'ref', value: [ 'mediaById', id ] })
 }
 ```
 
 ## `convert.toPathValues()`
 
-Usually you'll want to to turn a JSON object into an array of `{ path, value }` objects to be returned from a Falcor router, which is what this method does.
+This converts an input object into an array of `{ path, value }` objects that can be returned from a Falcor router.
 
 ```js
 const user = await fetchJson('/api/users/123');
@@ -163,118 +147,10 @@ return paths;
 
 ## `convert.toGraph()`
 
-To turn a JSON object directly into a graph, pass your JSON object to the `toGraph()` method.
-This might be useful for example in boostrapping a client-side Falcor Model cache.
+This converts an input object into a JSON graph that can be used to populate a Falcor model.
 
 ```js
 const user = await fetchJson('/api/users/123');
 const jsongFrag = convertUser.toGraph(user);
-```
-
-# Full example
-
-Let's look at an example that ties it all together.
-
-```js
-// create a converter for user objects
-const convertUser = graphify({
-  name: 'usersById',
-  move: [
-    { from: ['nemesis'], to: ['usersById','$id'] },
-    { from: ['avatars','$index'], to: ['mediaById','$id'] },
-  ]
-});
-```
-
-Here's the input JSON.
-Normally this would be fetched from a server but we'll just create it with literals.
-
-```js
-// user object example
-const user = {
-  id: '1',
-  username: 'greim',
-  email: 'greim@example.com',
-  avatars: [{
-    id: '2',
-    src: 'http://media.example.com/ac34df.jpg'
-  }, {
-    id: '3',
-    src: 'http://media.example.com/92b347.jpg'
-  }]
-  nemesis: {
-    id: '4',
-    username: 'antigreim',
-    email: 'antigreim@example.com'
-  }
-};
-```
-
-Now let's convert that to JSON graph using the rules declared above:
-
-```js
-// convert the user object to a graph
-const jsongFrag = convertUser.toGraph(user);
-console.log(jsongFrag);
-
-// output
-{
-  usersById: {
-    '1': {
-      id: '1',
-      username: 'greim',
-      email: 'greim@example.com',
-      avatars: {
-        length: 2,
-        0: { $type: 'ref', value: [ 'mediaById', '2' ] },
-        1: { $type: 'ref', value: [ 'mediaById', '3' ] }
-      }
-      nemesis: { $type: 'ref', value: [ 'usersById', '4' ] }
-    },
-    '4': {
-      id: '4',
-      username: 'antigreim',
-      email: 'antigreim@example.com'
-    }
-  },
-  mediaById: {
-    '2': {
-      id: '2',
-      src: 'http://media.example.com/ac34df.jpg'
-    },
-    '3': {
-      id: '3',
-      src: 'http://media.example.com/92b347.jpg'
-    }
-  }
-}
-```
-
-# Example with Falcor Router
-
-To use in a router, return the result of the `toPathValues()` method.
-
-```js
-// create a converter for users
-const convertUser = graphify({
-  name: 'users',
-  move: [ ... ]
-});
-
-// create a falcor router
-const MyRouter = FalcorRouter.createClass([{
-  route: "users[{keys:ids}]",
-  get: async function(pathSet) {
-    const ids = pathSet.ids;
-    const userPromises = ids.map(id => fetchJson(`/api/users/${id}`));
-    const rawUsers = yield Promise.all(userPromises);
-    return concat(rawUsers.map(convertUser.toPathValues)); // <-- conversion!
-  }
-}]);
-
-// array concatenation util
-function concat(arrs) {
-  return arrs.reduce((a, b) => a.concat(b), []);
-}
 ```
 
