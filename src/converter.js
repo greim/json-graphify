@@ -25,13 +25,6 @@ export default class {
     this._opts = deepFreeze(opts);
   }
 
-
-
-
-
-
-
-
   toPathValues(obj) {
 
     munge(obj, this._opts.munge);
@@ -75,14 +68,6 @@ export default class {
 
     return result;
   }
-
-
-
-
-
-
-
-
 
   toGraph(obj) {
     const paths = this.toPathValues(obj);
