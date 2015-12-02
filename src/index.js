@@ -13,5 +13,8 @@ export default function graphify(opts) {
   function toGraph(json) {
     return converter.toGraph(json);
   }
-  return Object.freeze({ toPathValues, toGraph });
+  function toPathMap(json) {
+    return converter.toPathMap(json);
+  }
+  return Object.freeze({ toPathValues, toGraph, toPathMap });
 }

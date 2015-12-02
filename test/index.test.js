@@ -238,6 +238,34 @@ describe('index', () => {
     });
   });
 
+  it('should convert to path map', () => {
+
+    const converted = convert.toPathMap({
+      id: '1',
+      username: 'foo',
+      followers: [{
+        id: '2',
+        username: 'bar'
+      }]
+    });
+
+    const expected = [
+      { path: [ 'users', '1', 'id' ], value: '1' },
+      { path: [ 'users', '1', 'username' ], value: 'foo' },
+      { path: [ 'users', '1', 'followers', 'length' ], value: 1 },
+      { path: [ 'users', '1', 'followers', 0 ], value: { $type: 'ref', value: [ 'users', '2' ] } },
+      { path: [ 'users', '2', 'id' ], value: '2' },
+      { path: [ 'users', '2', 'username' ], value: 'bar' }
+    ];
+
+    for (const { path, value } of expected) {
+      assert(converted.has(path), `did not contain ${JSON.stringify(path)}`);
+      assert.deepEqual(converted.get(path), value);
+    }
+
+    assert.strictEqual(converted.size, expected.length);
+  });
+
   it('should munge', () => {
 
     const converted = graphify({

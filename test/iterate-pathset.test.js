@@ -6,7 +6,7 @@
 import iteratePathset from '../src/iterate-pathset';
 import assert from 'assert';
 
-describe.only('iterate-pathset', () => {
+describe('iterate-pathset', () => {
 
   it('iterate nothing', () => {
     const pathSet = [];
