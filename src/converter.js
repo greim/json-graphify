@@ -26,10 +26,9 @@ export default class {
     this._opts = deepFreeze(opts);
   }
 
-  toPathValues(obj) {
+  *toPathValues(obj) {
 
     munge(obj, this._opts.munge);
-    const result = [];
     const prepend = [ this._opts.name, obj[this._opts.idAttribute] ];
 
     for (let { parents, path, value, isLeaf } of walkObject(obj)) {
@@ -46,7 +45,7 @@ export default class {
           move.amend(path, id);
           amended = true;
           if (isSubroot) {
-            result.push({ path: prepend.concat(origPath), value: $ref(path) });
+            yield { path: prepend.concat(origPath), value: $ref(path) };
           }
         } else {
           value = { $type: 'atom', value };
@@ -60,14 +59,12 @@ export default class {
         path = prepend.concat(path);
       }
       if (isLeaf) {
-        result.push({ path, value });
+        yield { path, value };
       } else if (Array.isArray(value)) {
         path.push('length');
-        result.push({ path, value: value.length });
+        yield { path, value: value.length };
       }
     }
-
-    return result;
   }
 
   toGraph(obj) {

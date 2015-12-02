@@ -26,7 +26,7 @@ describe('index', () => {
       username: 'foo'
     });
 
-    assert.deepEqual(converted, [
+    assert.deepEqual([...converted], [
       { path: ['users', '1', 'id'], value: '1' },
       { path: ['users', '1', 'username'], value: 'foo' }
     ]);
@@ -41,7 +41,7 @@ describe('index', () => {
       logo: { id: '2', src: 'http://example.com/logo.jpg' }
     });
 
-    assert.deepEqual(converted, [
+    assert.deepEqual([...converted], [
       { path: ['users', '1', 'id'], value: '1' },
       { path: ['users', '1', 'username'], value: 'foo' },
       { path: ['users', '1', 'email'], value: 'foo@example.com' },
@@ -62,7 +62,7 @@ describe('index', () => {
       ]
     });
 
-    assert.deepEqual(converted, [
+    assert.deepEqual([...converted], [
       { path: ['users', '1', 'id'], value: '1' },
       { path: ['users', '1', 'username'], value: 'foo' },
       { path: ['users', '1', 'followers', 'length'], value: 2 },
@@ -85,7 +85,7 @@ describe('index', () => {
       ]
     });
 
-    assert.deepEqual(converted, [
+    assert.deepEqual([...converted], [
       { path: ['users', '1', 'id'], value: '1' },
       { path: ['users', '1', 'username'], value: 'foo' },
       { path: ['users', '1', 'followers', 'length'], value: 1 },
@@ -106,7 +106,7 @@ describe('index', () => {
       ]
     });
 
-    assert.deepEqual(converted, [
+    assert.deepEqual([...converted], [
       { path: ['users', '1', 'id'], value: '1' },
       { path: ['users', '1', 'username'], value: 'foo' },
       { path: ['users', '1', 'followers', 'length'], value: 1 },
@@ -124,7 +124,7 @@ describe('index', () => {
 
     //console.log(JSON.stringify(converted));
 
-    assert.deepEqual(converted, [
+    assert.deepEqual([...converted], [
       { path: ['users', '1', 'id'], value: '1' },
       { path: ['users', '1', 'username'], value: 'foo' },
       { path: ['users', '1', 'followers', 'length'], value: 1 },
@@ -146,7 +146,7 @@ describe('index', () => {
 
     //console.log(JSON.stringify(converted));
 
-    assert.deepEqual(converted, [
+    assert.deepEqual([...converted], [
       { path: ['users', '1', 'id'], value: '1' },
       { path: ['users', '1', 'username'], value: 'foo' },
       { path: ['users', '1', 'logo'], value: { $type: 'atom', value: { yes: 'foo' } } }

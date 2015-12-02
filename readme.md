@@ -141,11 +141,11 @@ If it returns `undefined`, the value is deleted.
 
 ## `convert.toPathValues()`
 
-This converts an input object into an array of `{ path, value }` objects that can be returned from a Falcor router.
+This converts an input object into an iterator of `{ path, value }` objects.
 
 ```js
 const user = await fetchJson('/api/users/123');
-const paths = convertUser.toPathValues(user);
+const paths = [...convertUser.toPathValues(user)];
 return paths;
 ```
 
@@ -157,6 +157,7 @@ This returns a [PathMap](https://www.npmjs.com/package/pmap) of paths to values.
 const user = await fetchJson('/api/users/123');
 const pathMap = convertUser.toPathMap(user);
 console.log(pathMap.get(['users','123','username']));
+// 'wunderkid5000'
 ```
 
 ## `convert.toGraph()`
