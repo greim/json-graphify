@@ -26,6 +26,10 @@ export default class {
     this._opts = deepFreeze(opts);
   }
 
+  toPathValuesArray(obj) {
+    return [...this.toPathValues(obj)];
+  }
+
   *toPathValues(obj) {
 
     munge(obj, this._opts.munge);

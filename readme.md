@@ -142,10 +142,22 @@ If it returns `undefined`, the value is deleted.
 ## `convert.toPathValues()`
 
 This converts an input object into an iterator of `{ path, value }` objects.
+Note: this was recently changed from returning an array to returning an iterable.
+If an array is needed see `convert.toPathValuesArray()` below.
 
 ```js
 const user = await fetchJson('/api/users/123');
 const paths = [...convertUser.toPathValues(user)];
+return paths;
+```
+
+## `convert.toPathValuesArray()`
+
+Same as above, but returns an array.
+
+```js
+const user = await fetchJson('/api/users/123');
+const paths = convertUser.toPathValuesArray(user);
 return paths;
 ```
 
