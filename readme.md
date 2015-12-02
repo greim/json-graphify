@@ -149,6 +149,16 @@ const paths = convertUser.toPathValues(user);
 return paths;
 ```
 
+## `convert.toPathMap()`
+
+This returns a [PathMap](https://www.npmjs.com/package/pmap) of paths to values.
+
+```js
+const user = await fetchJson('/api/users/123');
+const pathMap = convertUser.toPathMap(user);
+console.log(pathMap.get(['users','123','username']));
+```
+
 ## `convert.toGraph()`
 
 This converts an input object into a JSON graph that can be used to populate a Falcor model.
