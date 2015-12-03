@@ -26,59 +26,57 @@ export default class {
     this._opts = deepFreeze(opts);
   }
 
-  toPathValuesArray(obj) {
-    return [...this.toPathValues(obj)];
-  }
+  *toPathValues(...objs) {
 
-  *toPathValues(obj) {
+    for (const obj of objs) {
+      munge(obj, this._opts.munge);
+      const prepend = [ this._opts.name, obj[this._opts.idAttribute] ];
 
-    munge(obj, this._opts.munge);
-    const prepend = [ this._opts.name, obj[this._opts.idAttribute] ];
-
-    for (let { parents, path, value, isLeaf } of walkObject(obj)) {
-      if (parents.length === 0) { continue; }
-      const move = findMove(this._opts.move, path);
-      let amended = false;
-      if (move) {
-        const isSubroot = move.from.length === path.length;
-        const idBearer = parents[move.from.length] || value;
-        const id = idBearer ? idBearer[move.idAttribute] : undefined;
-        if (id !== undefined) {
-          const origPath = path;
-          path = path.slice();
-          move.amend(path, id);
-          amended = true;
-          if (isSubroot) {
-            yield { path: prepend.concat(origPath), value: $ref(path) };
+      for (let { parents, path, value, isLeaf } of walkObject(obj)) {
+        if (parents.length === 0) { continue; }
+        const move = findMove(this._opts.move, path);
+        let amended = false;
+        if (move) {
+          const isSubroot = move.from.length === path.length;
+          const idBearer = parents[move.from.length] || value;
+          const id = idBearer ? idBearer[move.idAttribute] : undefined;
+          if (id !== undefined) {
+            const origPath = path;
+            path = path.slice();
+            move.amend(path, id);
+            amended = true;
+            if (isSubroot) {
+              yield { path: prepend.concat(origPath), value: $ref(path) };
+            }
+          } else {
+            value = { $type: 'atom', value };
+            const parent = parents[parents.length - 1];
+            const prop = path[path.length - 1];
+            parent[prop] = value;
+            isLeaf = true;
           }
-        } else {
-          value = { $type: 'atom', value };
-          const parent = parents[parents.length - 1];
-          const prop = path[path.length - 1];
-          parent[prop] = value;
-          isLeaf = true;
         }
-      }
-      if (!amended) {
-        path = prepend.concat(path);
-      }
-      if (isLeaf) {
-        yield { path, value };
-      } else if (Array.isArray(value)) {
-        path.push('length');
-        yield { path, value: value.length };
+        if (!amended) {
+          path = prepend.concat(path);
+        }
+        if (isLeaf) {
+          yield { path, value };
+        } else if (Array.isArray(value)) {
+          path.push('length');
+          yield { path, value: value.length };
+        }
       }
     }
   }
 
-  toGraph(obj) {
-    const paths = this.toPathValues(obj);
+  toGraph(...objs) {
+    const paths = this.toPathValues(...objs);
     const jsong = graphify(paths);
     return jsong;
   }
 
-  toPathMap(obj) {
-    const pathVals = this.toPathValues(obj);
+  toPathMap(...objs) {
+    const pathVals = this.toPathValues(...objs);
     const pathMap = new PathMap();
     for (const { path, value } of pathVals) {
       pathMap.set(path, value);

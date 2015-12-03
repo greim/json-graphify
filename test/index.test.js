@@ -19,7 +19,7 @@ describe('index', () => {
     ]
   });
 
-  it('should convert with no refs', () => {
+  it('should convert', () => {
 
     const converted = convert.toPathValues({
       id: '1',
@@ -29,6 +29,24 @@ describe('index', () => {
     assert.deepEqual([...converted], [
       { path: ['users', '1', 'id'], value: '1' },
       { path: ['users', '1', 'username'], value: 'foo' }
+    ]);
+  });
+
+  it('should convert more than one thing', () => {
+
+    const converted = convert.toPathValues({
+      id: '1',
+      username: 'foo'
+    }, {
+      id: '2',
+      username: 'bar'
+    });
+
+    assert.deepEqual([...converted], [
+      { path: ['users', '1', 'id'], value: '1' },
+      { path: ['users', '1', 'username'], value: 'foo' },
+      { path: ['users', '2', 'id'], value: '2' },
+      { path: ['users', '2', 'username'], value: 'bar' }
     ]);
   });
 
@@ -238,6 +256,30 @@ describe('index', () => {
     });
   });
 
+  it('should convert more than one thing to JSON graph', () => {
+
+    const converted = convert.toGraph({
+      id: '1',
+      username: 'foo'
+    }, {
+      id: '2',
+      username: 'bar'
+    });
+
+    assert.deepEqual(converted, {
+      users: {
+        1: {
+          id: '1',
+          username: 'foo'
+        },
+        2: {
+          id: '2',
+          username: 'bar'
+        }
+      }
+    });
+  });
+
   it('should convert to path map', () => {
 
     const converted = convert.toPathMap({
@@ -254,6 +296,31 @@ describe('index', () => {
       { path: [ 'users', '1', 'username' ], value: 'foo' },
       { path: [ 'users', '1', 'followers', 'length' ], value: 1 },
       { path: [ 'users', '1', 'followers', 0 ], value: { $type: 'ref', value: [ 'users', '2' ] } },
+      { path: [ 'users', '2', 'id' ], value: '2' },
+      { path: [ 'users', '2', 'username' ], value: 'bar' }
+    ];
+
+    for (const { path, value } of expected) {
+      assert(converted.has(path), `did not contain ${JSON.stringify(path)}`);
+      assert.deepEqual(converted.get(path), value);
+    }
+
+    assert.strictEqual(converted.size, expected.length);
+  });
+
+  it('should convert more than one thing to path map', () => {
+
+    const converted = convert.toPathMap({
+      id: '1',
+      username: 'foo'
+    }, {
+      id: '2',
+      username: 'bar'
+    });
+
+    const expected = [
+      { path: [ 'users', '1', 'id' ], value: '1' },
+      { path: [ 'users', '1', 'username' ], value: 'foo' },
       { path: [ 'users', '2', 'id' ], value: '2' },
       { path: [ 'users', '2', 'username' ], value: 'bar' }
     ];
