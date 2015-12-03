@@ -143,34 +143,24 @@ If it returns `undefined`, the value is deleted.
 
 This converts an input object into an iterator of `{ path, value }` objects.
 Note: this was recently changed from returning an array to returning an iterable.
-If an array is needed see `convert.toPathValuesArray()` below.
-Accepts one or more objects which are converted and merged into the returned value.
+If an array is needed simply do `[ ...convert.toPathValues() ]`.
+Returning an iterator instead of an array allows lazy evaluation.
+Accepts one or more objects which are converted and added to the result.
 
 ```js
-const user = await fetchJson('/api/users/123');
-const paths = [...convertUser.toPathValues(user)];
-return paths;
-```
-
-## `convert.toPathMap(...objects)`
-
-This returns a [PathMap](https://www.npmjs.com/package/pmap) of paths to values.
-Accepts one or more objects which are converted and merged into the returned value.
-
-```js
-const user = await fetchJson('/api/users/123');
-const pathMap = convertUser.toPathMap(user);
-console.log(pathMap.get(['users','123','username']));
-// 'wunderkid5000'
+const user1 = await fetchJson('/api/users/1');
+const user2 = await fetchJson('/api/users/2');
+const paths = [ ...convertUser.toPathValues(user1, user2) ];
 ```
 
 ## `convert.toGraph(...objects)`
 
 This converts an input object into a JSON graph that can be used to populate a Falcor model.
-Accepts one or more objects which are converted and merged into the returned value.
+Accepts one or more objects which are converted and added to the result.
 
 ```js
-const user = await fetchJson('/api/users/123');
-const jsongFrag = convertUser.toGraph(user);
+const user1 = await fetchJson('/api/users/1');
+const user2 = await fetchJson('/api/users/2');
+const graph = convertUser.toGraph(user1, user2);
 ```
 

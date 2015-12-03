@@ -9,7 +9,6 @@ import deepFreeze from 'deep-freeze';
 import munge from './munge';
 import createAmender from './create-amender';
 import match from './match-paths';
-import PathMap from 'pmap';
 
 export default class {
 
@@ -73,15 +72,6 @@ export default class {
     const paths = this.toPathValues(...objs);
     const jsong = graphify(paths);
     return jsong;
-  }
-
-  toPathMap(...objs) {
-    const pathVals = this.toPathValues(...objs);
-    const pathMap = new PathMap();
-    for (const { path, value } of pathVals) {
-      pathMap.set(path, value);
-    }
-    return pathMap;
   }
 }
 
