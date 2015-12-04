@@ -2,6 +2,8 @@
 
 This makes it easy to bring [Falcor](http://netflix.github.io/falcor/) into established projects, by transforming existing JSON REST responses into conformant [JSON Graph](http://netflix.github.io/falcor/documentation/jsongraph.html) objects.
 
+Note: Experimental! Might change before 1.0.
+
 # Install
 
 ```
@@ -164,3 +166,38 @@ const user2 = await fetchJson('/api/users/2');
 const graph = convertUser.toGraph(user1, user2);
 ```
 
+## `graphify.collector(pathHandlers)`
+
+This is an alternative approach added more recently, with the goal of being as performant and lightweight as possible.
+The idea here is that you'd create a collector like so:
+
+```js
+const collector = graphify.collector([{
+  path: [ 'users', '$key', 'avatar' ],
+  handler: avatar => $ref(['media', avatar.id])
+}]);
+```
+
+In the above `$key` is a placeholder for any property, and `$index` is a placeholder for any positive integer.
+Now, inside a Falcor route handler, you'd create a "pool" and add JSON objects to it like so:
+
+```js
+const pool = collector.start();
+pool.insert('users', users);
+// users was gotten from an API service
+```
+
+Then for each path requested by the user, extract that path.
+*If* that path matches one of the ones provided above, then the returned value is run through the `handler` function.
+Like so:
+
+```js
+// allPaths() iterates the pathSet
+// passed to the falcor route handler
+const pathVals = [];
+for (const path of allPaths(pathSet)) {
+  const value = pool.extract(path);
+  pathVals.push({ path, value });
+}
+return pathVals;
+```
