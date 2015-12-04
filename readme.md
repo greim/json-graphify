@@ -193,6 +193,12 @@ Each object will then be accessible at `users.$key.something` during extraction,
 Like so:
 
 ```js
+const value = pool.extract(['users','123','username']);
+```
+
+In a falcor router it might look like this:
+
+```js
 // allPaths() iterates the pathSet
 // passed to the falcor route handler
 const pathVals = [];
