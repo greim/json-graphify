@@ -179,7 +179,8 @@ const collector = graphify.collector([{
 ```
 
 In the above `$key` is a placeholder for any property, and `$index` is a placeholder for any positive integer.
-Now, inside a Falcor route handler, you'd create a "pool" and add JSON objects to it like so:
+So this path operates as a pattern.
+Now, inside a Falcor route handler, you'd create a "pool" and add JSON objects—presumably fetched from your REST service endpoints—to it like so:
 
 ```js
 const pool = collector.start();
@@ -187,8 +188,8 @@ pool.insert('users', users);
 // users was gotten from an API service
 ```
 
-Then for each path requested by the user, extract that path.
-*If* that path matches one of the ones provided above, then the returned value is run through the `handler` function.
+`users` in the above is an array of objects, each with an `id` attribute.
+Each object will then be accessible at `users.$key.something` during extraction, where `$key` is the `id` attribute.
 Like so:
 
 ```js
@@ -201,3 +202,5 @@ for (const path of allPaths(pathSet)) {
 }
 return pathVals;
 ```
+
+*If* the `path` used to extract matches one of the path patterns provided above, then the returned value is run through the associated `handler` function.
