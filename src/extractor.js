@@ -4,7 +4,7 @@
  */
 
 /*
-const extractor = new Collector([{
+const extractor = new Extractor([{
   path: [ 'users', '$key', 'avatar' ],
   handler: avatar => $ref([ 'media', avatar.id ])
 }]);
@@ -14,6 +14,7 @@ pool.extract(path);
 */
 
 import PatternMap from './pattern-map';
+import { get, set } from './obj';
 
 const privates = new WeakMap();
 
@@ -27,17 +28,9 @@ class Pool {
     privates.set(this, _);
   }
 
-  insert(name, things) {
+  insert(path, item) {
     const { graph } = privates.get(this);
-    for (const thing of things) {
-      if (!graph[name]) {
-        graph[name] = Object.create(null);
-      }
-      if (thing.id === undefined) {
-        throw new Error('missing id');
-      }
-      graph[name][thing.id] = thing;
-    }
+    set(graph, path, item);
   }
 
   extract(path) {
@@ -50,7 +43,7 @@ class Pool {
 
 // ----------------------------
 
-export default class Collector {
+export default class Extractor {
 
   constructor(pathHandlers) {
     const map = new PatternMap();
@@ -68,19 +61,6 @@ export default class Collector {
 }
 
 // ----------------------------
-
-function get(obj, path, idx = 0) {
-  const len = path.length - idx;
-  if (len === 0) {
-    return obj;
-  } else if (obj === null || obj === undefined) {
-    return obj;
-  } else {
-    const step = path[idx];
-    const child = obj[step];
-    return get(child, path, idx + 1);
-  }
-}
 
 function ident(thing) {
   return thing;

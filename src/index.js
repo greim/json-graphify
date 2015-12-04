@@ -4,12 +4,12 @@
  */
 
 import Converter from './converter';
-import Collector from './collector';
+import Extractor from './extractor';
 
 export default function graphify(opts) {
   return new Converter(opts);
 }
 
-export function collector(...args) {
-  return new Collector(...args);
+export function extractor(...args) {
+  return new Extractor(...args);
 }

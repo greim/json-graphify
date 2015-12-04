@@ -166,34 +166,44 @@ const user2 = await fetchJson('/api/users/2');
 const graph = convertUser.toGraph(user1, user2);
 ```
 
-## `graphify.collector(pathHandlers)`
+## `graphify.extractor(pathHandlers)`
 
-This is an alternative approach added more recently, with the goal of being as performant and lightweight as possible.
-The idea here is that you'd create a collector like so:
+This is an alternative approach, with the goal of being as performant and lightweight as possible.
+This is more suitable when the objects being converted don't need lots of munging.
+Subsequently, there's not much heavy object manipulation, and graph-building is more a manual process.
+
+The idea is to create an *extractor*, which is a factory used to create a *pool*.
+The extractor is kept in memory as a singleton and re-used.
+One pool is created for each Falcor route handler.
+Insert into the pool to build a graph, then extract to fulfill request paths.
+
+To create an extractor, pass it an array of `{ path, handler }` objects like so:
 
 ```js
-const collector = graphify.collector([{
+const extractor = graphify.extractor([{
   path: [ 'users', '$key', 'avatar' ],
   handler: avatar => $ref(['media', avatar.id])
 }]);
 ```
 
-In the above `$key` is a placeholder for any property, and `$index` is a placeholder for any positive integer.
-So this path operates as a pattern.
-Now, inside a Falcor route handler, you'd create a "pool" and add JSON objects—presumably fetched from your REST service endpoints—to it like so:
+`path` is a pattern where `$key` matches any property and `$index` matches any positive integer.
+`handler` is a function that receives the value and returns a result.
+For example, in the above, the `avatar` property on the resource is an ID string; we want to convert it to a JSON graph ref.
+This conversion is done lazily at extraction time.
+Next, create a pool and add JSON objects to it like so:
 
 ```js
-const pool = collector.start();
-pool.insert('users', users);
-// users was gotten from an API service
+const pool = extractor.start();
+for (const user of users) {
+  // build up the graph manually
+  pool.insert([ 'users', user.id ], user);
+}
 ```
 
-`users` in the above is an array of objects, each with an `id` attribute.
-Each object will then be accessible at `users.$key.something` during extraction, where `$key` is the `id` attribute.
-Like so:
+Next, extract the values you want like so:
 
 ```js
-const value = pool.extract(['users','123','username']);
+const value = pool.extract([ 'users', '123', 'username' ]);
 ```
 
 In a falcor router it might look like this:
@@ -202,6 +212,9 @@ In a falcor router it might look like this:
 // allPaths() iterates the pathSet
 // passed to the falcor route handler
 const pathVals = [];
+const pool = extractor.start();
+const user = await api.get(`/users/${id}`);
+pool.insert([ 'users', user.id ], user);
 for (const path of allPaths(pathSet)) {
   const value = pool.extract(path);
   pathVals.push({ path, value });

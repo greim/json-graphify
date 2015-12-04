@@ -6,13 +6,13 @@
 /* eslint-env mocha */
 
 import assert from 'assert';
-import Collector from '../src/collector';
+import Extractor from '../src/extractor';
 
-describe('collector', () => {
+describe('extractor', () => {
 
   it('should construct', () => {
 
-    new Collector([{
+    new Extractor([{
       path: ['123'],
       handler: foo => foo
     }]);
@@ -20,44 +20,44 @@ describe('collector', () => {
 
   it('should make a pool', () => {
 
-    const collector = new Collector([{
+    const extractor = new Extractor([{
       path: ['123'],
       handler: foo => foo
     }]);
-    const pool = collector.start();
+    const pool = extractor.start();
     assert(!!pool);
   });
 
   it('pool should insert', () => {
 
-    const collector = new Collector([{
+    const extractor = new Extractor([{
       path: ['123'],
       handler: foo => foo
     }]);
-    const pool = collector.start();
-    pool.insert('foo', [{ id: '123' }]);
+    const pool = extractor.start();
+    pool.insert(['foo','123'], { id: '123' });
   });
 
   it('pool should extract', () => {
 
-    const collector = new Collector([{
+    const extractor = new Extractor([{
       path: ['foo','bar'],
       handler: bar => bar
     }]);
-    const pool = collector.start();
-    pool.insert('foo', [{ id: '123' }]);
+    const pool = extractor.start();
+    pool.insert(['foo','123'], { id: '123' });
     const val = pool.extract(['foo','123','id']);
     assert.strictEqual(val, '123');
   });
 
   it('pool should handle a keyed value', () => {
 
-    const collector = new Collector([{
+    const extractor = new Extractor([{
       path: ['user','$key','bar'],
       handler: bar => bar * bar
     }]);
-    const pool = collector.start();
-    pool.insert('user', [{ id: '123', bar: 8 }]);
+    const pool = extractor.start();
+    pool.insert(['user','123'], { bar: 8 });
     const val = pool.extract(['user','123','bar']);
     assert.strictEqual(val, 64);
   });
