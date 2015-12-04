@@ -4,7 +4,7 @@
  */
 
 /*
-const extractor = new Extractor([{
+const extractor = new Collector([{
   path: [ 'users', '$key', 'avatar' ],
   handler: avatar => $ref([ 'media', avatar.id ])
 }]);
@@ -50,7 +50,7 @@ class Pool {
 
 // ----------------------------
 
-export default class Extractor {
+export default class Collector {
 
   constructor(pathHandlers) {
     const map = new PatternMap();
